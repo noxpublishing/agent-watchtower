@@ -37,3 +37,27 @@ active_entries() {
   [ -f "$1/active.list" ] || return 0
   grep -v '^[[:space:]]*\(#\|$\)' "$1/active.list" || true
 }
+
+# Serialize gate writers without flock (not present on stock macOS). Never
+# remove another owner's lock: a crashed owner requires inspection by the tower.
+gate_lock() {
+  local attempts=0
+  gate_lock_dir="$1/gate.lock"
+  while ! mkdir "$gate_lock_dir" 2>/dev/null; do
+    if [ "$attempts" -ge 5 ]; then
+      echo "watchtower: gate lock busy: $gate_lock_dir. Inspect its owner/processes; remove it only if orphaned, then retry." >&2
+      return 2
+    fi
+    sleep 1
+    attempts=$((attempts + 1))
+  done
+  printf '%s\n' "$$" > "$gate_lock_dir/pid"
+  trap 'gate_unlock' EXIT
+  trap 'exit 143' TERM
+  trap 'exit 130' INT
+}
+
+gate_unlock() {
+  rm -f "$gate_lock_dir/pid"
+  rmdir "$gate_lock_dir" 2>/dev/null || true
+}

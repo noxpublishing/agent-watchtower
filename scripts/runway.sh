@@ -24,6 +24,8 @@ home=$(tower_home) || exit 2
 name=$(worktree_name)
 runways=${TOWER_RUNWAYS:-3}
 limit=${TOWER_TIMEOUT:-5400}
+# Seconds allowed for TERM before killing the entire command process group.
+kill_grace=${TOWER_KILL_GRACE:-20}
 log="$home/runway.log"
 mkdir -p "$home/queue" "$home/runways"
 
@@ -40,20 +42,37 @@ ticket="$home/queue/$priority-$(date +%s)-$$"
 : > "$ticket"
 lane=
 job=
+stop_job() {
+  [ -n "$job" ] || return 0
+  # The leader may already have exited while its children ignore TERM.
+  # The positive PID fallback covers a signal arriving before setsid completes.
+  kill -TERM -- "-$job" 2>/dev/null || kill -TERM "$job" 2>/dev/null || true
+  grace=0
+  while [ "$grace" -lt "$kill_grace" ]; do
+    if ! kill -0 -- "-$job" 2>/dev/null && ! kill -0 "$job" 2>/dev/null; then break; fi
+    sleep 1
+    grace=$((grace + 1))
+  done
+  kill -KILL -- "-$job" 2>/dev/null || true
+  kill -KILL "$job" 2>/dev/null || true
+  wait "$job" 2>/dev/null || true
+  job=
+}
 cleanup() {
+  stop_job
   rm -f "$ticket"
   if [ -n "$lane" ]; then rm -rf "$lane"; fi
 }
 on_signal() {
-  if [ -n "$job" ]; then kill -TERM -- "-$job" 2>/dev/null; fi
-  cleanup
+  trap '' INT TERM
   exit 143
 }
 trap on_signal INT TERM
 trap cleanup EXIT
 
+ownerless_since=()
 drop_stale() {
-  local item pid
+  local item pid index first_seen
   for item in "$home"/queue/*; do
     [ -e "$item" ] || continue
     pid=${item##*-}
@@ -61,7 +80,22 @@ drop_stale() {
   done
   for item in "$home"/runways/*; do
     [ -d "$item" ] || continue
-    pid=$(cat "$item/pid" 2>/dev/null) || continue
+    index=${item##*/}
+    case "$index" in ''|*[!0-9]*) continue ;; esac
+    index=$((10#$index))
+    pid=$(cat "$item/pid" 2>/dev/null) || pid=
+    if [ -z "$pid" ]; then
+      # mkdir and writing pid are not atomic. Allow a live claimant time to
+      # publish, but never delete an ownerless lane that might still be live.
+      first_seen=${ownerless_since[$index]:-$(date +%s)}
+      ownerless_since[$index]=$first_seen
+      if [ "$(( $(date +%s) - first_seen ))" -ge 5 ]; then
+        echo "watchtower: runway has no owner PID: $item. Inspect running checks; remove it only if orphaned, then retry." >&2
+        return 2
+      fi
+      continue
+    fi
+    ownerless_since[$index]=
     if [ -n "$pid" ] && ! kill -0 "$pid" 2>/dev/null; then rm -rf "$item"; fi
   done
 }
@@ -72,7 +106,7 @@ position() {
 
 while :; do
   if parked; then say_parked; rm -f "$ticket"; exit 75; fi
-  drop_stale
+  drop_stale || exit 2
   free=0
   i=1
   while [ "$i" -le "$runways" ]; do
@@ -102,7 +136,6 @@ rm -f "$ticket"
 start=$(date +%s)
 printf '%s start %s %s\n' "$(date '+%F %T')" "$label" "$name" >> "$log"
 
-marker="$lane/timed-out"
 # A separate process group, so a timeout also stops test workers and child servers.
 if command -v setsid >/dev/null 2>&1; then
   setsid "$@" <&0 &
@@ -113,27 +146,23 @@ else
 fi
 job=$!
 
-(
-  waited=0
-  while kill -0 "$job" 2>/dev/null; do
-    if [ "$waited" -ge "$limit" ]; then
-      : > "$marker"
-      kill -TERM -- "-$job" 2>/dev/null
-      grace=0
-      while [ "$grace" -lt 20 ] && kill -0 -- "-$job" 2>/dev/null; do
-        sleep 1
-        grace=$((grace + 1))
-      done
-      kill -KILL -- "-$job" 2>/dev/null
-      exit 0
-    fi
-    sleep 1
-    waited=$((waited + 1))
-  done
-) >/dev/null 2>&1 &
-
-wait "$job"
-code=$?
-[ -e "$marker" ] && code=124
+waited=0
+timed_out=0
+while kill -0 "$job" 2>/dev/null; do
+  if [ "$waited" -ge "$limit" ]; then
+    timed_out=1
+    stop_job
+    break
+  fi
+  sleep 1
+  waited=$((waited + 1))
+done
+if [ "$timed_out" -eq 1 ]; then
+  code=124
+else
+  wait "$job"
+  code=$?
+  stop_job
+fi
 printf '%s end %s %s exit=%s %ss\n' "$(date '+%F %T')" "$label" "$name" "$code" "$(( $(date +%s) - start ))" >> "$log"
 exit "$code"

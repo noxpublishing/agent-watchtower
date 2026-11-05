@@ -4,7 +4,15 @@ set -u
 root=$(cd "$(dirname "$0")/.." && pwd)
 s="$root/scripts"
 work=$(mktemp -d)
-trap 'rm -rf "$work"' EXIT
+runners=
+cleanup() {
+  trap '' INT TERM
+  for pid in $runners; do kill -TERM "$pid" 2>/dev/null || true; done
+  wait 2>/dev/null || true
+  rm -rf "$work"
+}
+trap cleanup EXIT
+trap 'exit 143' INT TERM
 fails=0
 pass() { printf 'ok   %s\n' "$1"; }
 fail() { printf 'FAIL %s\n' "$1"; fails=$((fails + 1)); }
@@ -34,26 +42,6 @@ home=$(git rev-parse --git-common-dir); home=$(cd "$home" && pwd)/watchtower
 (cd ../one && "$s/runway.sh" ok true >/dev/null); check "success passes through" "$?" 0
 (cd ../one && "$s/runway.sh" bad sh -c 'exit 7' >/dev/null); check "failure code passes through" "$?" 7
 (cd ../one && TOWER_TIMEOUT=2 "$s/runway.sh" hung sleep 60 >/dev/null); check "timeout gives 124" "$?" 124
-(cd ../one && TOWER_TIMEOUT=2 "$s/runway.sh" tree sh -c 'sleep 61 & sleep 61; wait' >/dev/null)
-sleep 2
-left=$(pgrep -f 'sleep 61' | grep -c . || true)
-check "timeout stops child processes" "$left" 0
-[ -z "$(ls "$home/runways")" ] && pass "runways are free afterwards" || fail "runways are free afterwards"
-
-# Capacity and order: six jobs, two runways, never more than two at once.
-"$s/tower-gate.sh" off >/dev/null
-mark="$work/peak"; : > "$mark"
-job='mkdir -p "$0/in"; touch "$0/in/$$"; n=$(ls "$0/in" | wc -l); echo "$n" >> "$0/peak"; sleep 1; rm "$0/in/$$"'
-order="$work/order"; : > "$order"
-for i in 1 2 3 4 5 6; do
-  (cd ../one && TOWER_RUNWAYS=2 "$s/runway.sh" "job$i" sh -c "echo $i >> '$order'; $job" "$work" >/dev/null) &
-  sleep 1.2
-done
-wait
-peak=$(sort -n "$mark" | tail -1)
-[ "$peak" -le 2 ] && pass "at most two ran at once (peak $peak)" || fail "capacity exceeded (peak $peak)"
-check "first come, first served" "$(tr -d '\n' < "$order")" 123456
-
 # A dead holder does not block forever.
 mkdir -p "$home/runways/1"; echo 999999 > "$home/runways/1/pid"
 (cd ../one && TOWER_RUNWAYS=1 "$s/runway.sh" stale true >/dev/null); check "stale runway is recovered" "$?" 0
@@ -61,20 +49,20 @@ mkdir -p "$home/runways/1"; echo 999999 > "$home/runways/1/pid"
 # Priority goes first.
 "$s/tower-gate.sh" off >/dev/null
 order2="$work/order2"; : > "$order2"
-(cd ../one && TOWER_RUNWAYS=1 "$s/runway.sh" holder sleep 3 >/dev/null) &
+(cd ../one && exec env TOWER_RUNWAYS=1 "$s/runway.sh" holder sleep 3 >/dev/null) &
+runners="$runners $!"
 sleep 1.5
-(cd ../one && TOWER_RUNWAYS=1 "$s/runway.sh" normal sh -c "echo normal >> '$order2'" >/dev/null) &
+(cd ../one && exec env TOWER_RUNWAYS=1 "$s/runway.sh" normal sh -c "echo normal >> '$order2'" >/dev/null) &
+runners="$runners $!"
 sleep 1.1
-(cd ../one && TOWER_RUNWAYS=1 "$s/runway.sh" --priority urgent sh -c "echo urgent >> '$order2'" >/dev/null) &
+(cd ../one && exec env TOWER_RUNWAYS=1 "$s/runway.sh" --priority urgent sh -c "echo urgent >> '$order2'" >/dev/null) &
+runners="$runners $!"
 wait
+runners=
 check "priority overtakes the queue" "$(tr '\n' ' ' < "$order2")" "urgent normal "
 
-# Aborting
-(cd ../one && exec "$s/runway.sh" abort sleep 62 >/dev/null) &
-pid=$!
-sleep 2; kill -TERM "$pid"; wait "$pid"; check "abort gives 143" "$?" 143
-sleep 1
-check "abort stops the job" "$(pgrep -f 'sleep 62' | grep -c . || true)" 0
+# Concurrent admission, actual overlapping checks and process-tree cleanup.
+"$root/tests/runtime.sh"; check "runtime regressions" "$?" 0
 
 # Status and landing report
 "$s/tower-status.sh" | grep -q 'area/two' ; check "status lists worktrees" "$?" 0

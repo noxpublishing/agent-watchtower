@@ -13,6 +13,7 @@ home=$(tower_home) || exit 2
 list="$home/active.list"
 max=${TOWER_MAX_ACTIVE:-3}
 base_folder=$(basename "$(git worktree list --porcelain 2>/dev/null | sed -n '1s/^worktree //p')")
+gate_lock "$home" || exit 2
 
 count() { active_entries "$home" | grep -vxF "$base_folder" | grep -c . || true; }
 

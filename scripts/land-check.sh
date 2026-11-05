@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Read-only report before landing a candidate. Changes nothing.
+# Report before landing: does not alter branches or worktrees.
+# The merge-tree simulation may write Git objects.
 #   land-check.sh <candidate-branch> [base]
 set -u
 here=$(cd "$(dirname "$0")" && pwd)

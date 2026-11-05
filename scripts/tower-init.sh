@@ -10,6 +10,7 @@ for file in brief handoff; do
   [ -f "$home/$file.md" ] || cp "$skill/assets/$file-template.md" "$home/$file.md"
 done
 base_folder=$(basename "$(git worktree list --porcelain | sed -n '1s/^worktree //p')")
+gate_lock "$home" || exit 2
 if [ ! -f "$home/active.list" ]; then
   printf '# Worktree folders allowed on the runways, one per line.\n%s\n' "$base_folder" > "$home/active.list"
 fi
@@ -17,5 +18,5 @@ cat <<EOF
 tower state: $home
 brief:       $home/brief.md    fill this in, every session reads it
 shift log:   $home/handoff.md  keep this current, the next tower reads it
-gate:        $home/active.list  only the base checkout so far; other worktrees are parked until you add them
+gate:        $home/active.list  inspect current entries with tower-gate.sh list
 EOF
