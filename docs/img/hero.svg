@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img" aria-label="Watchtower: a lit tower watches three agents land on the main branch while five others wait parked in a holding ring.">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0A0F1C"/><stop offset="1" stop-color="#121A2C"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#FFC56B" stop-opacity=".42"/><stop offset="1" stop-color="#FFC56B" stop-opacity="0"/>
+    </linearGradient>
+    <style>
+      text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+      .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    </style>
+  </defs>
+  <rect width="1280" height="640" fill="url(#sky)"/>
+  <g fill="#fff" opacity=".5">
+    <circle cx="90" cy="40" r="1"/><circle cx="330" cy="28" r="1.2"/><circle cx="560" cy="60" r="1"/><circle cx="700" cy="32" r="1.3"/><circle cx="880" cy="52" r="1"/><circle cx="1210" cy="44" r="1.2"/><circle cx="1140" cy="110" r="1"/><circle cx="620" cy="240" r="1"/><circle cx="48" cy="360" r="1"/><circle cx="1240" cy="300" r="1"/>
+  </g>
+
+  <!-- beam -->
+  <g transform="translate(1078 212)">
+    <polygon points="0,-6 -760,-96 -760,96 0,6" fill="url(#beam)">
+      <animateTransform attributeName="transform" type="rotate" values="-13;11;-13" dur="9s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/>
+    </polygon>
+  </g>
+
+  <!-- title -->
+  <text x="72" y="170" font-size="84" font-weight="750" letter-spacing="-2.5" fill="#F4F7FB">Watchtower</text>
+  <text x="74" y="226" font-size="31" fill="#B6C3D6">Run a fleet of coding agents.</text>
+  <text x="74" y="266" font-size="31" fill="#B6C3D6">Keep main green and your limits alive.</text>
+
+  <!-- holding ring -->
+  <ellipse cx="700" cy="350" rx="118" ry="38" fill="none" stroke="#54627A" stroke-width="1.5" stroke-dasharray="3 7"/>
+  <g fill="#7C8AA2">
+    <circle r="7"><animateMotion dur="14s" repeatCount="indefinite" path="M818,350 a118,38 0 1,0 -236,0 a118,38 0 1,0 236,0"/></circle>
+    <circle r="7"><animateMotion dur="14s" begin="-2.8s" repeatCount="indefinite" path="M818,350 a118,38 0 1,0 -236,0 a118,38 0 1,0 236,0"/></circle>
+    <circle r="7"><animateMotion dur="14s" begin="-5.6s" repeatCount="indefinite" path="M818,350 a118,38 0 1,0 -236,0 a118,38 0 1,0 236,0"/></circle>
+    <circle r="7"><animateMotion dur="14s" begin="-8.4s" repeatCount="indefinite" path="M818,350 a118,38 0 1,0 -236,0 a118,38 0 1,0 236,0"/></circle>
+    <circle r="7"><animateMotion dur="14s" begin="-11.2s" repeatCount="indefinite" path="M818,350 a118,38 0 1,0 -236,0 a118,38 0 1,0 236,0"/></circle>
+  </g>
+  <text x="700" y="356" text-anchor="middle" font-size="19" fill="#8E9CB3">parked</text>
+
+  <!-- landing paths -->
+  <g fill="none" stroke="#FFB454" stroke-opacity=".28" stroke-width="2">
+    <path id="a" d="M120,350 C210,350 250,480 340,516"/>
+    <path id="b" d="M260,350 C350,350 400,480 500,516"/>
+    <path id="c" d="M400,350 C490,350 550,480 660,516"/>
+  </g>
+  <g fill="#FFB454">
+    <circle r="9"><animateMotion dur="6s" repeatCount="indefinite" path="M120,350 C210,350 250,480 340,516"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.08;.92;1" dur="6s" repeatCount="indefinite"/></circle>
+    <circle r="9"><animateMotion dur="6s" begin="-2s" repeatCount="indefinite" path="M260,350 C350,350 400,480 500,516"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.08;.92;1" dur="6s" begin="-2s" repeatCount="indefinite"/></circle>
+    <circle r="9"><animateMotion dur="6s" begin="-4s" repeatCount="indefinite" path="M400,350 C490,350 550,480 660,516"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.08;.92;1" dur="6s" begin="-4s" repeatCount="indefinite"/></circle>
+  </g>
+  <text x="72" y="330" font-size="19" fill="#FFC56B">3 flying</text>
+
+  <!-- main -->
+  <line x1="64" y1="520" x2="1216" y2="520" stroke="#3DDC97" stroke-width="4" stroke-linecap="round"/>
+  <g fill="#0A0F1C" stroke="#3DDC97" stroke-width="4">
+    <circle cx="150" cy="520" r="9"/><circle cx="340" cy="520" r="9"/><circle cx="500" cy="520" r="9"/><circle cx="660" cy="520" r="9"/><circle cx="820" cy="520" r="9"/><circle cx="1000" cy="520" r="9"/>
+  </g>
+  <text x="72" y="566" class="mono" font-size="24" fill="#3DDC97">main</text>
+  <text x="1216" y="566" text-anchor="end" class="mono" font-size="21" fill="#7FE7BB">only the tower lands</text>
+
+  <!-- tower -->
+  <g fill="#27324A">
+    <polygon points="1048,500 1064,246 1092,246 1108,500 1088,500 1078,300 1068,500"/>
+    <rect x="1036" y="500" width="84" height="20" rx="2"/>
+    <rect x="1048" y="228" width="60" height="18" rx="2"/>
+    <polygon points="1040,180 1116,180 1078,146"/>
+  </g>
+  <g stroke="#27324A" stroke-width="4">
+    <line x1="1064" y1="330" x2="1094" y2="330"/><line x1="1059" y1="410" x2="1099" y2="410"/>
+  </g>
+  <rect x="1050" y="182" width="56" height="44" rx="3" fill="#FFC56B"/>
+  <rect x="1077" y="182" width="3" height="44" fill="#27324A"/>
+</svg>

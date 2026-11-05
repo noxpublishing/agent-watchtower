@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 500" width="1120" height="500" role="img" aria-label="Terminal output: the gate refuses a fourth area, and tower-status shows runways, the queue and each worktree as flying or parked.">
+  <defs><style>
+    text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:16px;fill:#C9D3E2;white-space:pre}
+    .p{fill:#7FE7BB}.m{fill:#7C8AA2}.w{fill:#FF8A80}.a{fill:#FFC56B}.g{fill:#3DDC97}.h{fill:#F4F7FB;font-weight:700}
+  </style></defs>
+  <rect width="1120" height="500" rx="14" fill="#0E1525"/>
+  <rect width="1120" height="40" rx="14" fill="#1B2436"/><rect y="26" width="1120" height="14" fill="#1B2436"/>
+  <circle cx="26" cy="20" r="7" fill="#FF6B5F"/><circle cx="50" cy="20" r="7" fill="#FFBE2E"/><circle cx="74" cy="20" r="7" fill="#29CC41"/>
+  <text x="28" y="76"><tspan class="p">$</tspan> scripts/tower-gate.sh add mail</text>
+  <text x="28" y="100" class="w">refused: mail. Already 3 active. Land or park one first.</text>
+  <text x="28" y="136"><tspan class="p">$</tspan> scripts/tower-status.sh</text>
+  <text x="28" y="160">base: main @ 55bc448</text>
+  <text x="28" y="196" class="h">runways:</text>
+  <text x="28" y="220" xml:space="preserve">  <tspan class="a">full-tests</tspan>             billing                           0m</text>
+  <text x="28" y="244" xml:space="preserve">  <tspan class="a">full-tests</tspan>             search                            0m</text>
+  <text x="28" y="268" xml:space="preserve">  waiting: 1</text>
+  <text x="28" y="304" class="h">worktrees (ahead/behind main, uncommitted files, state):</text>
+  <text x="28" y="328" xml:space="preserve">  shop           main               0/0     0  <tspan class="g">flying</tspan></text>
+  <text x="28" y="352" xml:space="preserve">  billing        area/billing       1/0     0  <tspan class="g">flying</tspan></text>
+  <text x="28" y="376" xml:space="preserve">  calendar       area/calendar      1/0     0  <tspan class="m">parked</tspan></text>
+  <text x="28" y="400" xml:space="preserve">  mail           area/mail          1/0     1  <tspan class="m">parked</tspan></text>
+  <text x="28" y="424" xml:space="preserve">  onboarding     area/onboarding    1/0     0  <tspan class="g">flying</tspan></text>
+  <text x="28" y="448" xml:space="preserve">  search         area/search        1/0     0  <tspan class="g">flying</tspan></text>
+</svg>
