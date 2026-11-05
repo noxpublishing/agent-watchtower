@@ -2,6 +2,8 @@
 
 Script tests establish what the shell helpers enforce. Independent agent scenarios establish whether the instructions lead to good decisions. Neither result substitutes for the other.
 
+The [official OpenAI guide to evaluating skills](https://developers.openai.com/blog/eval-skills) describes evaluating observable results and execution traces. The cases below apply that approach to Watchtower's orchestration workflow.
+
 ## Script checks
 
 From the skill repository, run `bash tests/run.sh`. From an active Watchtower project, run that command through the installed `runway.sh`, using absolute paths. The suite uses temporary repositories and should clean up only its own processes.

@@ -19,9 +19,9 @@ When the session exposes collaboration tools, use their actual schemas. Common c
 | Inventory | `list_agents` |
 | Stop current work | `interrupt_agent`; interruption alone does not prove subprocesses stopped |
 
-These are capabilities to discover, not a mandatory API. Other Codex clients may expose a `wait` or `close_agent` tool instead; use only what is actually listed. Do not assume that Claude's `get_usage`, `start_session` or `detach_session` exists.
+These are capabilities observed in this environment, not a mandatory Codex API. Use only the names and schemas actually listed by the client. The [official hosted multi-agent reference](https://developers.openai.com/api/docs/guides/responses-multi-agent) documents these collaboration primitives; a client can expose a different interface. Do not assume that Claude's `get_usage`, `start_session` or `detach_session` exists.
 
-Reserve a slot for the tower. Four concurrent agent slots including the tower allow at most three workers. Reduce that number for other active agents; use serial areas if delegation is unavailable. `TOWER_MAX_ACTIVE` controls gate entries, while `TOWER_RUNWAYS` controls checks: neither creates agent capacity or stops a worker from editing.
+Read the limit's counting convention. Four total concurrent agent slots including the tower allow at most three workers; a limit explicitly counting only subagents already excludes the tower, so do not subtract it twice. Reduce capacity for other active agents and use serial areas if delegation is unavailable. `TOWER_MAX_ACTIVE` controls gate entries, while `TOWER_RUNWAYS` controls checks: neither creates agent capacity or stops a worker from editing.
 
 Subagents share the filesystem. Create each worktree explicitly before dispatching:
 

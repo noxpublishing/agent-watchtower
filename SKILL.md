@@ -33,11 +33,11 @@ Resolve this installed skill's directory from the loaded `SKILL.md` and set `WAT
 
 **New project.** Parallel agents on an empty repository each invent their own structure and collide at once, so one session goes first. Run `git init` and make a first commit if needed. Agree the goal with the human, then have one session lay the foundation: structure, test and build commands, CI, and any contracts the areas share. Land it, then continue below.
 
-**Existing project.** Change nothing yet. Continue below.
+**Existing project.** First read project rules, inspect worktrees and running sessions, and identify any dirty or untracked work. For takeover, read `references/takeover.md` before changing existing work. Initializing Watchtower writes internal state, so do it after this intake.
 
-1. Run `"$WATCHTOWER_SKILL_DIR/scripts/tower-init.sh"` from the repository. It creates shared state inside the common git directory. Existing gate entries are preserved; this does not stop sessions or park already active worktrees.
+1. After intake, run `"$WATCHTOWER_SKILL_DIR/scripts/tower-init.sh"` from the repository. It creates shared state inside the common git directory. Existing gate entries are preserved; this does not stop sessions or park already active worktrees.
 2. Run `"$WATCHTOWER_SKILL_DIR/scripts/tower-status.sh"`, then read the project's own rules (`AGENTS.md`, `CLAUDE.md`, CI config). Find the test, type-check and build commands, current agent capacity, and the user's limits on integration and publication. Preserve existing authorization instead of asking again.
-3. Taking over existing worktrees or stalled sessions? Follow `references/takeover.md` before you touch anything.
+3. For takeover, finish the inventory and backups in `references/takeover.md` before rebasing, integrating or cleaning up existing work.
 4. If CI on the base branch is already red, that is block zero: see "The base is already red" in `references/takeover.md`.
 5. Fill in `brief.md`: shared rules, verification commands, what only CI can check, reserved ranges for anything numbered. Sessions read this instead of a long prompt.
 6. Slice new work into areas that touch different files, or sort what already exists. Put them in an order: what unblocks others comes first, what is nearly done comes before what is new, and an end-to-end pilot and privacy or lifecycle work come last, because they need to see everything else.
