@@ -29,12 +29,12 @@
   <g fill="none" stroke="#7C8AA2" stroke-width="2.5" marker-end="url(#g)">
     <path d="M214,185 H250"/><path d="M430,185 H466"/><path d="M646,185 H682"/><path d="M862,185 H898"/><path d="M1032,185 H1068"/>
   </g>
-  <path d="M556,128 C556,70 340,70 340,128" fill="none" stroke="#FF8A80" stroke-width="2.5" stroke-dasharray="6 6" marker-end="url(#o)"/>
-  <text x="448" y="62" text-anchor="middle" class="l" style="fill:#FFB3AC">hung or red: fix it first</text>
-  <path d="M965,242 V300" fill="none" stroke="#FF8A80" stroke-width="2.5" stroke-dasharray="6 6" marker-end="url(#o)"/>
-  <text x="985" y="288" class="l" style="fill:#FFB3AC">law, money, accounts, publishing, deleting</text>
-  <rect x="880" y="302" width="170" height="44" rx="10" fill="#1B2436" stroke="#FF8A80"/>
-  <text x="965" y="331" text-anchor="middle" font-size="20" font-weight="700" fill="#FFB3AC">You decide</text>
+  <path d="M556,128 C556,92 340,92 340,128" fill="none" stroke="#FF8A80" stroke-width="2.5" stroke-dasharray="6 6" marker-end="url(#o)"/>
+  <text x="448" y="96" text-anchor="middle" class="l" style="fill:#FFB3AC">hung or red: fix it first</text>
+  <path d="M965,128 V88" fill="none" stroke="#FF8A80" stroke-width="2.5" stroke-dasharray="6 6" marker-end="url(#o)"/>
+  <rect x="880" y="40" width="170" height="44" rx="10" fill="#1B2436" stroke="#FF8A80"/>
+  <text x="965" y="69" text-anchor="middle" font-size="20" font-weight="700" fill="#FFB3AC">You decide</text>
+  <text x="866" y="68" text-anchor="end" class="l" style="fill:#FFB3AC">law, money, accounts, publishing, deleting</text>
   <path d="M1158,242 C1158,392 124,392 124,242" fill="none" stroke="#3DDC97" stroke-width="2.5" marker-end="url(#t)"/>
   <text x="520" y="376" text-anchor="middle" class="l" style="fill:#7FE7BB">landed: the tower calls the next parked session</text>
 </svg>
