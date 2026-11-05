@@ -157,6 +157,7 @@ scripts/land-check.sh feature/search
 | `TOWER_RUNWAYS` | 3 | Checks running at once |
 | `TOWER_MAX_ACTIVE` | 3 | Areas on the gate |
 | `TOWER_TIMEOUT` | 5400 | Seconds before a check counts as hung |
+| `TOWER_KILL_GRACE` | 20 | Seconds between TERM and KILL before releasing a check's slot |
 | `TOWER_BASE` | origin's default | Base branch |
 | `TOWER_HOME` | `.git/watchtower` | State directory |
 
@@ -195,6 +196,7 @@ Worktrees give each agent its own folder. They don't decide who runs, who lands,
 - It comes from one large project and has not been benchmarked. The numbers above describe that run, not a promise.
 - It doesn't replace your tests or CI. It runs them in an order you can afford.
 - An agent following a skill can still make mistakes. The tower's own hotfix is on the list of traps for a reason.
+- An orphaned gate lock or runway directory without an owner PID fails with exit 2 and an inspection hint. It is not deleted automatically. Process cleanup covers the launched process group; a command that deliberately creates a separate session can escape it.
 
 ## Contributing
 

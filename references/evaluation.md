@@ -12,6 +12,8 @@ Meaningful invariants include actual overlapping jobs respecting the runway capa
 
 Run on Linux and macOS. Linux success does not verify macOS process-group fallback behavior. `land-check.sh` is advisory: its exit status alone does not mean a candidate is safe to merge or that the project tests passed.
 
+See [the 2026-11-05 Codex evaluation record](../docs/codex-evaluation.md) for the observed baseline failures, checks run, and remaining limits of this adaptation.
+
 Validate the frontmatter with the available skill validator. For Codex's skill-creator installation this is:
 
 ```bash
