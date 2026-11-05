@@ -8,9 +8,9 @@ Updated: <date>. Keep this current during the shift, so a crash or limit stop lo
 
 ## Rules and limits
 
-- Active areas at once: <3>
-- Stop line: <for example no new building past 80 % of the weekly limit; resets on ...>
-- Allowed without asking: <for example landing green candidates and pushing the base>
+- Active areas at once: <worker capacity after reserving the tower; gate and runway limits separately>
+- Stop line: <user-supplied limit; mark usage unavailable if the client cannot measure it>
+- Allowed without asking: <existing authorization for local integration, push and deployment separately>
 - Never: <deploy, real providers, ...>
 
 ## Block order
@@ -27,6 +27,8 @@ Order constraints: <what must land before what>.
 | Name | ID | Worktree | State |
 | --- | --- | --- | --- |
 | <name> | <id> | <folder> | <flying, parked at commit, landed> |
+
+Client capabilities: <available spawn/message/wait/inventory tools; missing resume, usage or detach capabilities>. Record exact branch tips and tested SHAs with the sessions.
 
 ## Base branch and CI
 

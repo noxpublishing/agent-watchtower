@@ -6,6 +6,7 @@
   <a href="https://github.com/noxpublishing/agent-watchtower/actions/workflows/test.yml"><img src="https://github.com/noxpublishing/agent-watchtower/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-3DDC97" alt="MIT license"></a>
   <img src="https://img.shields.io/badge/Claude%20Code-skill-FFB454" alt="Claude Code skill">
+  <img src="https://img.shields.io/badge/Codex-skill-3DDC97" alt="Codex skill">
   <img src="https://img.shields.io/badge/needs-bash%20%2B%20git-7C8AA2" alt="Needs bash and git">
 </p>
 
@@ -16,6 +17,14 @@
 ```bash
 git clone https://github.com/noxpublishing/agent-watchtower ~/.claude/skills/watchtower
 ```
+
+For Codex, install in its skill directory instead:
+
+```bash
+git clone https://github.com/noxpublishing/agent-watchtower ~/.codex/skills/watchtower
+```
+
+If already installed, update the existing skill rather than creating a second copy. In the next Codex turn, invoke `$watchtower`. It discovers the available agent tools, reserves a slot for the tower, and gives workers explicit worktree paths and file ownership. See [client capabilities](references/harness.md#codex) and [how to evaluate it](references/evaluation.md).
 
 ## Start it
 
@@ -160,7 +169,8 @@ scripts/land-check.sh feature/search
 |---|---|---|
 | Claude Code desktop app | Starts, messages and hands over sessions directly. This is where it was developed. | Yes |
 | Claude Code in a terminal | Subagents, or one session per tmux pane | Yes |
-| Codex, Cursor and others | Use that tool's own way of running sessions. Not tested yet. | Yes |
+| Codex | Explicit worktree dispatch, available collaboration tools, local-only integration, and handoff when usage/detach APIs are absent. See [evaluation scope](references/evaluation.md). | Yes |
+| Cursor and others | Use that tool's own way of running sessions. Agent behavior not tested. | Yes |
 
 Tests run on Linux and macOS. See [the harness notes](references/harness.md).
 

@@ -4,10 +4,10 @@
 
 Change nothing until you know what exists.
 
-1. `git fetch`, then `scripts/tower-status.sh`.
+1. `git fetch` when a remote is configured and reachable, then `"$WATCHTOWER_SKILL_DIR/scripts/tower-status.sh"`. For an offline or remote-less repository, record that remote freshness is unverified.
 2. For each worktree: read the last commits and `git status --short`. Note what is finished, half done, or abandoned.
 3. Find the sessions: list them in your tool, or ask the human which belong to what. A session stopped by a usage limit keeps its conversation and can usually be resumed. Sessions stopped long ago are often cheaper to replace with a fresh one and a short brief.
-4. `scripts/tower-overlap.sh` shows which branches touch the same files.
+4. `"$WATCHTOWER_SKILL_DIR/scripts/tower-overlap.sh"` shows which branches touch the same files.
 
 ## Make it safe
 
@@ -24,7 +24,7 @@ snapshot=$(git -C <worktree> stash create)
 [ -n "$snapshot" ] && git update-ref refs/backup/<name>-uncommitted "$snapshot"
 ```
 
-`stash create` skips untracked files, so check those by hand. Do not commit or stash on someone's behalf if a person or a live session may still be working there. Ask first.
+`stash create` skips untracked files. Inventory them with `git ls-files --others --exclude-standard` in each worktree. Before replacing or cleaning a worktree, preserve needed files separately outside the repository and verify the copy; do not print their contents into logs. Include ignored files if the requested operation could remove them. Do not commit or mutate someone's active worktree. Coordinate with its owner before changing it.
 
 ## Sort
 

@@ -4,7 +4,7 @@
 
 - `git status -sb` in the base checkout. If someone else has uncommitted changes that overlap, wait. Do not stash their work.
 - `git fetch`, so you compare against the real base and not a stale local copy.
-- `scripts/land-check.sh <branch>`.
+- `"$WATCHTOWER_SKILL_DIR/scripts/land-check.sh" <branch>`.
 - Check that CI on the current base is green or that you know why not. A red base hides new failures.
 
 ## What "ready" means
@@ -24,13 +24,13 @@ Tell the session exactly what it must not turn back. A rebase is where finished 
 
 ## How much to verify
 
-Full verification on a close base, then targeted suites after the last rebase, is usually enough, as long as CI runs everything after the push. Rerun fully when:
+Full verification on a close base, then targeted suites after the last rebase, can be enough when authorized CI will run everything after the push. For local-only integration, verify the actual combined commit locally and disclose checks that require CI. Rerun fully when:
 
 - the base brought changes to the same area
 - you resolved real conflicts
 - a dependency or migration changed
 
-If a full run has a failure that is not in the candidate's area, run that suite alone. If it passes alone, it is probably load or test pollution. Land if the area is unrelated, write it down, and do not call it fixed.
+If a full run fails but the affected suite passes alone, investigate test order, shared state and load. Passing alone does not establish that the candidate is unrelated. Compare base and candidate under the same conditions and preserve the failing logs. Follow the red-base procedure in `takeover.md`: pause normal landings until repaired, unless the user has authorized a documented exception for an independently assessed candidate. Do not label an incomplete verification green.
 
 ## Batch landings
 
@@ -42,11 +42,17 @@ cd ../integrate-batch-a
 git cherry-pick <candidate-1> <candidate-2>
 ```
 
-Resolve the conflicts, then run one full verification. The candidates have stopped running by now, so remove them from the gate and add the batch worktree. If they are still busy, use `tower-gate.sh add --force` for this one run. If it is green, fast-forward the base and push once.
+Resolve the conflicts, then run one full verification. Confirm that candidate workers have stopped before removing them from the gate and adding the batch worktree. `--force` bypasses the gate's active-area limit; it does not stop workers or increase machine capacity. Avoid it while candidates are still running. If the batch is green, fast-forward the agreed local target; push once only when authorized.
 
 Afterwards, tell the sessions their work is on the base. Their branches now differ from what landed, so they must start any follow-up from the new base.
 
-## After the push
+## Local preparation or publication
+
+Keep the user's existing authorization explicit in the shared brief. When local-only work is requested or publication has not been authorized, leave a verified integration branch with its exact SHA and pending CI-only checks. Do not create a remote branch or push just to obtain CI evidence. Ask about publication only when the local result is ready for review and publication is actually needed.
+
+If the user already authorized pushing the relevant branches, proceed within that scope without asking again. The instructions below apply to authorized publication.
+
+## After an authorized push
 
 Pushing feature branches can cost a CI run each, so normally only the base gets pushed. If only CI can check something (containers, another platform) and the candidate changes exactly that, push its branch once under a temporary name, wait for the result, then land.
 
@@ -60,4 +66,4 @@ When fixing a red base:
 
 ## Cleanup
 
-`git worktree remove`, `git branch -D`, and update `active.list`. Add a line to the project's journal if it has one. Keep `handoff.md` current.
+Confirm the owning session has stopped. Inspect tracked and untracked changes and verify every candidate commit is preserved. Prefer `git worktree remove` without force and `git branch -d`. After a cherry-pick or rebase, keep a backup ref and check that the actual changes survived before deleting the original branch; a failed safe delete is a reason to inspect, not automatically use `-D`. Update `active.list` and keep `handoff.md` current.
