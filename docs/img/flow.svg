@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 420" width="1280" height="420" role="img" aria-label="Life of a piece of work: parked, flying, runway, candidate, tower, main. A hung check goes back to flying. Questions about law, money, accounts, publishing and deletion go to you. After each landing the tower calls the next parked session.">
+  <defs>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#7C8AA2"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#FF8A80"/></marker>
+    <marker id="t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3DDC97"/></marker>
+    <style>
+      text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+      .t{font-size:25px;font-weight:700}.s{font-size:16px;fill:#AEBBCD}.l{font-size:16px;fill:#8E9CB3}
+    </style>
+  </defs>
+  <rect width="1280" height="420" rx="18" fill="#0E1525"/>
+
+  <g stroke-width="2">
+    <rect x="36" y="130" width="176" height="110" rx="14" fill="#1B2436" stroke="#54627A"/>
+    <rect x="252" y="130" width="176" height="110" rx="14" fill="#3A2B12" stroke="#FFB454"/>
+    <rect x="468" y="130" width="176" height="110" rx="14" fill="#1B2436" stroke="#54627A"/>
+    <rect x="684" y="130" width="176" height="110" rx="14" fill="#1B2436" stroke="#54627A"/>
+    <rect x="900" y="130" width="130" height="110" rx="14" fill="#2B2412" stroke="#FFC56B"/>
+    <rect x="1070" y="130" width="176" height="110" rx="14" fill="#123326" stroke="#3DDC97"/>
+  </g>
+  <g text-anchor="middle">
+    <text x="124" y="176" class="t" fill="#D5DCE8">Parked</text><text x="124" y="204" class="s">work committed,</text><text x="124" y="225" class="s">costs nothing</text>
+    <text x="340" y="176" class="t" fill="#FFC56B">Flying</text><text x="340" y="204" class="s" style="fill:#E0C79A">in its own worktree,</text><text x="340" y="225" class="s" style="fill:#E0C79A">three at a time</text>
+    <text x="556" y="176" class="t" fill="#D5DCE8">Runway</text><text x="556" y="204" class="s">heavy checks queue,</text><text x="556" y="225" class="s">with a time limit</text>
+    <text x="772" y="176" class="t" fill="#D5DCE8">Candidate</text><text x="772" y="204" class="s">honest commit:</text><text x="772" y="225" class="s">checked and not</text>
+    <text x="965" y="176" class="t" fill="#FFC56B">Tower</text><text x="965" y="204" class="s" style="fill:#E0C79A">checks,</text><text x="965" y="225" class="s" style="fill:#E0C79A">rebases</text>
+    <text x="1158" y="176" class="t" fill="#7FE7BB">main</text><text x="1158" y="204" class="s" style="fill:#9FDCC1">fast-forward,</text><text x="1158" y="225" class="s" style="fill:#9FDCC1">then CI</text>
+  </g>
+  <g fill="none" stroke="#7C8AA2" stroke-width="2.5" marker-end="url(#g)">
+    <path d="M214,185 H250"/><path d="M430,185 H466"/><path d="M646,185 H682"/><path d="M862,185 H898"/><path d="M1032,185 H1068"/>
+  </g>
+  <path d="M556,128 C556,70 340,70 340,128" fill="none" stroke="#FF8A80" stroke-width="2.5" stroke-dasharray="6 6" marker-end="url(#o)"/>
+  <text x="448" y="62" text-anchor="middle" class="l" style="fill:#FFB3AC">hung or red: fix it first</text>
+  <path d="M965,242 V300" fill="none" stroke="#FF8A80" stroke-width="2.5" stroke-dasharray="6 6" marker-end="url(#o)"/>
+  <text x="985" y="288" class="l" style="fill:#FFB3AC">law, money, accounts, publishing, deleting</text>
+  <rect x="880" y="302" width="170" height="44" rx="10" fill="#1B2436" stroke="#FF8A80"/>
+  <text x="965" y="331" text-anchor="middle" font-size="20" font-weight="700" fill="#FFB3AC">You decide</text>
+  <path d="M1158,242 C1158,392 124,392 124,242" fill="none" stroke="#3DDC97" stroke-width="2.5" marker-end="url(#t)"/>
+  <text x="520" y="376" text-anchor="middle" class="l" style="fill:#7FE7BB">landed: the tower calls the next parked session</text>
+</svg>

@@ -17,9 +17,47 @@
 git clone https://github.com/noxpublishing/agent-watchtower ~/.claude/skills/watchtower
 ```
 
-Then, in any repository:
+## Start it
 
-> Be the orchestrator for this repo. Get the billing, search and onboarding work onto main, three at a time.
+Install once, open your agent in any repository or empty folder, and say what you want. Mention *watchtower*, or type `/watchtower` if your tool has slash commands.
+
+<table>
+<tr><th width="50%">Starting something new</th><th width="50%">Already have a project</th></tr>
+<tr>
+<td>
+
+> Use watchtower. I want to build `<your idea or plan>`. Set up the foundation first, split the rest into areas, and show me the order before you start.
+
+The tower has one session lay the foundation: structure, test command, CI and shared contracts. Parallel agents on an empty repository would each invent their own. Then the areas fly in blocks.
+
+</td>
+<td>
+
+> Use watchtower on this repo. Goal: `<what should be true at the end>`. Look at what's here, including open branches, and propose the order.
+
+The tower reads your rules, CI and branches, backs up what isn't merged, and asks only what is really yours to decide. Then it starts the first block.
+
+</td>
+</tr>
+</table>
+
+### What people use it for
+
+Anything too big for one agent that can be split and verified:
+
+| You have | Say something like |
+|---|---|
+| **A product idea or spec** | *Build this spec with watchtower. Foundation first, then three areas at a time.* |
+| **A big feature across the stack** | *Add `<feature>` across API, app and docs. You orchestrate.* |
+| **A backlog** | *Work through these 15 issues. Group the ones that touch the same files.* |
+| **A migration or large refactor** | *Move all modules from `<old>` to `<new>`, in batches, with main green the whole time.* |
+| **Quality work in many places** | *Raise test coverage in the weakest modules, one area per agent.* |
+| **Stalled agents and old branches** | *Take over these worktrees and get what's worth keeping onto main.* |
+| **A red main and a pile of work** | *CI is red and six branches are waiting. Sort this out.* |
+| **Sessions stopped by a limit** | *Limits are back. Resume the stopped sessions, most important first.* |
+| **Limits draining too fast** | *We're burning through usage. Fix how the agents run.* |
+
+Not worth it for one small change a single agent can finish. Just ask that agent.
 
 ## Twenty agents are not twenty times faster
 
@@ -33,33 +71,18 @@ Watchtower came out of exactly that: one real project, more than twenty parallel
 
 ## How it works
 
-```mermaid
-flowchart LR
-    P(["Parked<br/>work committed,<br/>costs nothing"]) -->|tower calls| F(["Flying<br/>max 3"])
-    F -->|heavy check| R[["Runway<br/>queue + time limit"]]
-    R -->|green| C(["Candidate"])
-    R -->|hung, exit 124| F
-    C -->|land-check,<br/>rebase, verify| T{"Tower"}
-    T -->|fast-forward| M(["main"])
-    M -->|check CI,<br/>call the next| P
-    T -.->|law, money, accounts,<br/>publishing, deleting| H(["You decide"])
-
-    style M fill:#123326,stroke:#3DDC97,color:#7FE7BB
-    style F fill:#3A2B12,stroke:#FFB454,color:#FFC56B
-    style P fill:#1B2436,stroke:#54627A,color:#B6C3D6
-    style H fill:#1B2436,stroke:#FF8A80,color:#FFB3AC
-```
+<p align="center">
+  <img src="docs/img/flow.svg" alt="Parked, flying, runway, candidate, tower, main. Hung checks go back. Decisions that are yours come to you. After each landing the next session is called." width="100%">
+</p>
 
 ## The six laws
 
-| | |
-|---|---|
-| **1. Few fly at once** | Three active areas by default, the rest park. Every landing forces everyone still flying to rebase and retest, so fewer flying means less repeated work. |
-| **2. Only the tower lands** | One writer on the base branch means one place that knows its state. |
-| **3. Heavy checks use the runway** | A shared queue with a time limit, so a hung test stops itself and says so. |
-| **4. Check your own landings hardest** | A fix that passes alone can break its neighbours. CI comes before the next landing. |
-| **5. Decide routine, ask the rest** | Naming and test approach get decided. Law, money, accounts, publishing and deletion go to you, as options. |
-| **6. Waiting is not reporting** | Every wake-up costs tokens. Sessions report results, not "still waiting". |
+1. **Few fly at once.** Three active areas by default, the rest park. Every landing forces everyone still flying to rebase and retest, so fewer flying means less repeated work.
+2. **Only the tower lands.** One writer on the base branch means one place that knows its state.
+3. **Heavy checks use the runway.** A shared queue with a time limit, so a hung test stops itself and says so.
+4. **Check your own landings hardest.** A fix that passes alone can break its neighbours. CI comes before the next landing.
+5. **Decide routine, ask the rest.** Naming and test approach get decided. Law, money, accounts, publishing and deletion go to you, as options.
+6. **Waiting is not reporting.** Every wake-up costs tokens. Sessions report results, not "still waiting".
 
 ## What's in the box
 
@@ -98,15 +121,9 @@ All of these really happened. [The full list](references/failure-modes.md) has w
 
 > **The pre-check that checked nothing.** A clever shell loop reported "no conflicts". It never split its list. The real cherry-pick had twelve.
 
-## Try it
+## The scripts on their own
 
-> I have twelve stalled worktrees from yesterday and CI on main is red. Take over and consolidate them.
-
-> Parallel agents keep breaking main and burning my limit. Fix how we run them.
-
-> Limits are back. Resume the sessions that stopped, most important first.
-
-The scripts also work without any agent:
+They work without any agent, in any git repository:
 
 ```bash
 scripts/tower-init.sh

@@ -1,6 +1,6 @@
 ---
 name: watchtower
-description: Orchestrate many parallel coding-agent sessions and git worktrees across a whole project, and land their work safely on the main branch. Use this whenever someone wants to run several areas or features in parallel, "be the orchestrator", dispatch agents into worktrees, take over a pile of stalled or half-finished sessions, resume sessions stopped by usage limits, consolidate branches, or asks why parallel agents keep breaking main or burning through limits. Also when they say things like "orchestriere das", "alle Worktrees", "mehrere Agenten parallel", "block by block". Not for one small change one agent can finish alone.
+description: Orchestrate many parallel coding-agent sessions and git worktrees across a whole project, new or existing, and land their work safely on the main branch. Use this whenever a goal is too big for one agent and can be split: building a product from an idea or spec, a feature across the stack, a backlog of issues, a migration or large refactor, quality work across many modules. Also when someone wants to "be the orchestrator", dispatch agents into worktrees, take over stalled sessions and old branches, resume sessions stopped by usage limits, or asks why parallel agents keep breaking main or burning through limits, including "orchestriere das", "alle Worktrees", "mehrere Agenten parallel", "block by block". Not for one small change one agent can finish alone.
 ---
 
 # Watchtower
@@ -21,6 +21,10 @@ The rules below come from one real run with more than twenty parallel sessions. 
 6. **Waiting is not reporting.** Every wake-up costs tokens, and an old session costs far more per wake-up than a new one. Sessions report results, not progress. So do you.
 
 ## Start of a shift
+
+**New project.** Parallel agents on an empty repository each invent their own structure and collide at once, so one session goes first. Run `git init` and make a first commit if needed. Agree the goal with the human, then have one session lay the foundation: structure, test and build commands, CI, and any contracts the areas share. Land it, then continue below.
+
+**Existing project.** Change nothing yet. Continue below.
 
 1. Run `scripts/tower-init.sh` from the repository. It creates shared state inside the common git directory, so all worktrees see it and it can never be committed.
 2. Run `scripts/tower-status.sh`, then read the project's own rules (`CLAUDE.md`, `AGENTS.md`, CI config). Find the commands for full tests, type checks and builds.
