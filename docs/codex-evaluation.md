@@ -1,6 +1,6 @@
 # Codex adaptation: 2026-11-05
 
-The original skill was developed in Claude Code. This evaluation checked its instructions against the actual tools of the current Codex session and exercised the shell helpers in disposable repositories on Linux. All changes were prepared locally; nothing was pushed or deployed.
+The original skill was developed in Claude Code. This evaluation checked its instructions against the actual tools of the current Codex session and exercised the shell helpers in disposable repositories on Linux. The evaluation was completed locally before the user requested publication as a pull request; it did not push or deploy changes.
 
 Source baseline: `9dca63b598a89ae86b43eba6531cd4b76ec7c9fa`.
 Combined code and skill checked: `98abbf83ca521a8dca9c5e2fa8c575d705e75895`. Subsequent evaluation-record and README changes do not alter that tested runtime or skill entrypoint.
@@ -39,7 +39,7 @@ This requires the checkout to be active if a gate is configured. The regression 
 
 ## What this does not establish
 
-- macOS was not available locally. The existing Linux/macOS CI matrix is retained, but the new code has not been pushed to trigger it.
+- macOS was not available locally. The existing Linux/macOS CI matrix is retained; consult the pull request's checks for results obtained after publication.
 - There is no production-scale A/B benchmark or measured token/cost reduction. Use the [execution pilot](../references/evaluation.md#a-small-execution-pilot) before making performance claims.
 - Cleanup covers the launched process group. A process that deliberately creates another session, or SIGKILL against the wrapper itself, can bypass orderly cleanup.
 - Orphaned locks and PID-less lanes require inspection; they deliberately fail closed instead of deleting ambiguous state.
