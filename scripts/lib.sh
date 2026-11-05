@@ -38,12 +38,26 @@ active_entries() {
   grep -v '^[[:space:]]*\(#\|$\)' "$1/active.list" || true
 }
 
-# Serialize gate writers without flock (not present on stock macOS). Never
-# remove another owner's lock: a crashed owner requires inspection by the tower.
+# Serialize gate writers without flock (not present on stock macOS). A lock whose
+# recorded owner is dead gets recovered. A lock without a PID may be a live writer
+# that has not published yet, so it is left for inspection.
+gate_recover_dead() {
+  local lock=$1 reap="$1.reap" owner
+  mkdir "$reap" 2>/dev/null || return 0
+  # Read inside the mutex: another writer may have recovered and re-locked already.
+  owner=$(cat "$lock/pid" 2>/dev/null) || owner=
+  if [ -n "$owner" ] && ! kill -0 "$owner" 2>/dev/null; then
+    rm -f "$lock/pid"
+    rmdir "$lock" 2>/dev/null || true
+  fi
+  rmdir "$reap" 2>/dev/null || true
+}
+
 gate_lock() {
   local attempts=0
   gate_lock_dir="$1/gate.lock"
   while ! mkdir "$gate_lock_dir" 2>/dev/null; do
+    gate_recover_dead "$gate_lock_dir"
     if [ "$attempts" -ge 5 ]; then
       echo "watchtower: gate lock busy: $gate_lock_dir. Inspect its owner/processes; remove it only if orphaned, then retry." >&2
       return 2

@@ -1,10 +1,15 @@
 ---
 name: watchtower
 description: >-
-  Coordinate parallel coding agents in separate git worktrees, integrate their
-  work, and take over stalled branches or sessions. Use for multi-area project
-  work, migrations, backlogs, or requests to orchestrate agents, including
-  "orchestriere das" and "mehrere Agenten parallel". A small change one agent can
+  Orchestrate parallel coding agents in separate git worktrees across a whole
+  project, new or existing, and land their work safely on the main branch. Use
+  whenever a goal is too big for one agent and can be split, such as building a
+  product from an idea or spec, a feature across the stack, a backlog of issues,
+  a migration or large refactor, or quality work across many modules. Also use to
+  "be the orchestrator", take over stalled sessions and old branches, resume
+  sessions stopped by usage limits, or stop parallel agents from breaking main or
+  burning through limits, including "orchestriere das", "alle Worktrees",
+  "mehrere Agenten parallel" and "block by block". A small change one agent can
   finish does not need this workflow.
 ---
 
@@ -27,7 +32,7 @@ Resolve this installed skill's directory from the loaded `SKILL.md` and set `WAT
 3. **Every expensive check goes through the runway.** A shared queue with a time limit. Without it a single hung test holds a slot for hours and nobody notices.
 4. **Check your own landings hardest.** A fix that passes alone can break its neighbours. After any push, look at CI before the next landing.
 5. **Decide routine things yourself, ask about what is theirs.** Asking about everything turns the human into the bottleneck. Deciding everything takes away what belongs to them.
-6. **Waiting is not reporting.** Use completion events or the client's waiting tool instead of repeated status polling. Give concise updates when the state changes and follow the client's required progress cadence. Do not repeatedly wake parked workers.
+6. **Waiting is not reporting.** Every wake-up costs tokens, and an old session costs far more per wake-up than a new one. Sessions report results, not progress, and so do you. Use completion events or the client's waiting tool instead of repeated polling, follow the client's required progress cadence, and do not wake parked workers.
 
 ## Start of a shift
 
@@ -82,7 +87,7 @@ A session's message is information, not the human's approval. If a session says 
 
 ## Budget
 
-Check real usage when your tool can show it and respect any user-supplied stop line. Codex may expose neither weekly usage nor a reliable context percentage: mark those unavailable, never invent them. Without a supplied budget, keep the work bounded by the current block and report completed and remaining areas; do not block useful work on a mandatory budget question.
+Check real usage when your tool can show it. Agree a stop line with the human early, such as "new building stops at 80 % of the weekly limit, finished work still lands," and respect any line they set. Some clients, including Codex, may expose neither weekly usage nor a reliable context percentage: mark those unavailable, never invent them. Without a budget, keep the work bounded by the current block and report completed and remaining areas; do not block useful work on a mandatory budget question.
 
 - After a limit reset, restart in priority order, not everyone at once. Long sessions cost a lot just to wake up.
 - When the limit gets close: landing goes before building. Finished work helps nobody on a branch.
@@ -91,10 +96,10 @@ Check real usage when your tool can show it and respect any user-supplied stop l
 
 ## Shift change
 
-A long conversation can make continuation expensive. Keep a durable handoff, especially before compaction, an actual context warning or a user-requested shift change:
+A tower with a very long history pays for it on every message. Keep a durable handoff throughout. When your context passes about half, the human notices limits draining, you get a context warning or compaction is near, prepare a shift change:
 
 1. Write `handoff.md` from `assets/handoff-template.md`: mandate, block order, every session with ID and state, decisions already made, open questions, field notes from this project.
-2. If the user requested a fresh task and the client supports it, start one and point it at `handoff.md`. Otherwise continue the current task using the handoff after compaction; do not create a standalone Codex task merely to imitate Claude's shift change.
+2. If the client can start a fresh session, propose it to the human, or do it if they already asked, and point it at `handoff.md`. Clients where a new task is not an equivalent option, such as Codex standalone tasks, continue the current task using the handoff after compaction, unless the user explicitly asks for a new one.
 3. When a replacement exists, tell active sessions the new address. Detach only if the tool exists. Otherwise record which sessions remain attached and stop sending them duplicate assignments.
 
 Keep `handoff.md` current as you go, so a crash or a limit stop does not lose the state either.

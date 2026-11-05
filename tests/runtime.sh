@@ -76,6 +76,21 @@ grep -q 'Inspect its owner' "$work/lock.log" || fail "gate lock needs actionable
 [ -d "$home/gate.lock" ] || fail "orphaned lock was deleted"
 rmdir "$home/gate.lock"
 pass "orphaned gate lock fails without deleting another owner's lock"
+
+# A lock left by a dead writer recovers by itself, and reading never needs the lock.
+mkdir "$home/gate.lock"
+"$s/tower-gate.sh" list >/dev/null || fail "list needs no lock"
+rmdir "$home/gate.lock"
+mkdir "$home/gate.lock"; echo 999999 > "$home/gate.lock/pid"
+"$s/tower-gate.sh" add --force w3 >/dev/null || fail "dead owner's lock was not recovered"
+[ ! -e "$home/gate.lock" ] || fail "gate lock left behind"
+# A lock with a live owner stays.
+mkdir "$home/gate.lock"; echo "$$" > "$home/gate.lock/pid"
+"$s/tower-gate.sh" add --force w4 >/dev/null 2>&1
+[ "$?" -eq 2 ] || fail "live owner's lock did not block"
+[ -f "$home/gate.lock/pid" ] || fail "live owner's lock was removed"
+rm "$home/gate.lock/pid"; rmdir "$home/gate.lock"
+pass "dead writer's lock recovers, a live writer's lock stays"
 "$s/tower-gate.sh" off >/dev/null
 
 # Two lanes must really overlap; a start barrier prevents a serial false pass.
@@ -104,6 +119,21 @@ peak=$(sort -n "$work/peak" | tail -1 | tr -d ' ')
 [ "$peak" -eq 2 ] || fail "expected actual peak 2, got $peak"
 pass "six competing checks overlap at exactly two lanes"
 
+# Order: with one lane, waiting checks run first come, first served.
+order="$work/order"; : > "$order"
+(exec env TOWER_RUNWAYS=1 "$s/runway.sh" order-hold sleep 5 >/dev/null 2>&1) &
+pids="$!"; runners="$runners $!"
+sleep 1.2
+for i in 1 2 3; do
+  (exec env TOWER_RUNWAYS=1 "$s/runway.sh" "order-$i" sh -c "echo $i >> '$order'" >/dev/null 2>&1) &
+  pids="$pids $!"; runners="$runners $!"
+  sleep 1.2
+done
+for pid in $pids; do wait "$pid" || fail "ordered check failed"; done
+runners=
+[ "$(tr -d '\n' < "$order")" = 123 ] || fail "not first come, first served: $(tr -d '\n' < "$order")"
+pass "waiting checks run first come, first served"
+
 # A lane with no pid may be an incomplete live claim: report, never erase it.
 mkdir "$home/runways/1"
 TOWER_RUNWAYS=1 "$s/runway.sh" ownerless true >"$work/ownerless.log" 2>&1
@@ -123,6 +153,19 @@ echo "$$" > "$1/leader.pid"
 bash "$2/child.sh" "$1/child.pid" &
 wait
 SH
+# A normal finish still stops children left behind, without touching the old PID.
+cat > "$work/leaves-child.sh" <<'SH'
+sh -c 'trap "" TERM; echo $$ > "$1"; while :; do sleep 1; done' _ "$1" &
+sleep 0.5
+exit 0
+SH
+TOWER_RUNWAYS=1 "$s/runway.sh" leftover bash "$work/leaves-child.sh" "$work/left.pid" >/dev/null 2>&1
+code=$?
+[ "$code" -eq 0 ] || fail "normal finish returned $code"
+left=$(cat "$work/left.pid")
+alive "$left" && fail "child left behind after a normal finish"
+pass "a normal finish stops leftover children and keeps its exit code"
+
 for mode in abort timeout; do
   dir="$work/tree-$mode"; mkdir "$dir"
   (exec env TOWER_RUNWAYS=1 TOWER_TIMEOUT=3 "$s/runway.sh" "$mode" bash "$work/parent.sh" "$dir" "$work" >"$dir/log" 2>&1) &

@@ -8,7 +8,7 @@ Every session reads this first. Keep it short and current.
 - Worktree: `<absolute path>`. Owned files/modules: `<scope>`. Others share the filesystem: preserve their edits and coordinate shared interfaces.
 - Do not push, deploy, or touch real providers, accounts, payments or production.
 - Never revert what is on `<base>`. After a rebase, check that nothing was undone.
-- Add regression evidence for demonstrated bugs and run checks appropriate to the change. Do not weaken an assertion to get green.
+- Write the failing test first when fixing a bug, and run checks appropriate to the change. Do not weaken an assertion to get green.
 - Report results, not progress. No "still waiting" messages: every wake-up costs tokens.
 
 ## Verification
@@ -21,6 +21,7 @@ Run heavy checks only through the runway, so the machine is not overloaded and a
 | --- | --- | --- |
 | 75 | Parked, not your turn | Commit your state, end your turn, wait for the tower |
 | 124 | Hung past the time limit | Find the cause, do not simply retry |
+| 2 | The queue itself is stuck, for example a runway without an owner | Read the message and tell the tower |
 | 143 | Aborted by someone | Confirm cleanup and the reason before retrying |
 | 137 | Killed, often out of memory | Check before running again |
 | other | Your command's result | Read it |

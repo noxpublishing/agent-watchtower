@@ -8,7 +8,7 @@
 
 **Others nearby:** <session name and ID, what they own, what to agree with them directly>. You share the filesystem with other workers. Preserve their edits; coordinate shared contracts instead of reverting their work.
 
-**Done means:** <acceptance checks and any reserved ranges>. Run checks appropriate to the change; expensive verification goes through `<absolute skill directory>/scripts/runway.sh`. Verify the real interface when relevant, then audit your changes. Deliver clean commits and report the branch, tested commit SHA, commands and results, known gaps, and any uncommitted files to the tower at <address>.
+**Done means:** <acceptance checks and any reserved ranges>. Write the failing test first for fixes and run checks appropriate to the change; expensive verification goes through `<absolute skill directory>/scripts/runway.sh`. Verify the real interface when relevant, then audit your changes. Deliver clean commits and report the branch, tested commit SHA, commands and results, known gaps, and any uncommitted files to the tower at <address>.
 
 If the gate returns 75, stop further editing and checking, preserve your current work and wait for the tower. A timeout (124) requires investigation before retrying. If a worker tool is interrupted, explicitly clean up its owned subprocesses before declaring it stopped.
 

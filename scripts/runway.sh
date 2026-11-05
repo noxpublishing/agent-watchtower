@@ -8,6 +8,7 @@
 #       If nobody is acting as the tower, ask the human.
 #   124 hung: stopped after TOWER_TIMEOUT seconds (default 5400). Find the cause first.
 #   143 aborted by a person or the tower. Retrying is fine.
+#   2   usage error, or a runway without an owner that needs inspecting.
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 . "$here/lib.sh"
@@ -15,7 +16,7 @@ here=$(cd "$(dirname "$0")" && pwd)
 priority=5
 if [ "${1:-}" = "--priority" ]; then priority=0; shift; fi
 if [ "$#" -lt 2 ]; then
-  sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//' >&2
+  sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//' >&2
   exit 2
 fi
 label=$1; shift
@@ -42,20 +43,31 @@ ticket="$home/queue/$priority-$(date +%s)-$$"
 : > "$ticket"
 lane=
 job=
+job_reaped=0
 stop_job() {
   [ -n "$job" ] || return 0
-  # The leader may already have exited while its children ignore TERM.
-  # The positive PID fallback covers a signal arriving before setsid completes.
-  kill -TERM -- "-$job" 2>/dev/null || kill -TERM "$job" 2>/dev/null || true
+  # Once reaped, the PID may belong to someone else: only the process group remains,
+  # and it can outlive its leader through children that ignore TERM.
+  if [ "$job_reaped" -eq 1 ]; then
+    kill -TERM -- "-$job" 2>/dev/null || { job=; return 0; }
+  else
+    # The positive PID fallback covers a signal arriving before setsid completes.
+    kill -TERM -- "-$job" 2>/dev/null || kill -TERM "$job" 2>/dev/null || true
+  fi
   grace=0
   while [ "$grace" -lt "$kill_grace" ]; do
-    if ! kill -0 -- "-$job" 2>/dev/null && ! kill -0 "$job" 2>/dev/null; then break; fi
+    if ! kill -0 -- "-$job" 2>/dev/null; then
+      [ "$job_reaped" -eq 1 ] && break
+      kill -0 "$job" 2>/dev/null || break
+    fi
     sleep 1
     grace=$((grace + 1))
   done
   kill -KILL -- "-$job" 2>/dev/null || true
-  kill -KILL "$job" 2>/dev/null || true
-  wait "$job" 2>/dev/null || true
+  if [ "$job_reaped" -eq 0 ]; then
+    kill -KILL "$job" 2>/dev/null || true
+    wait "$job" 2>/dev/null || true
+  fi
   job=
 }
 cleanup() {
@@ -162,6 +174,7 @@ if [ "$timed_out" -eq 1 ]; then
 else
   wait "$job"
   code=$?
+  job_reaped=1
   stop_job
 fi
 printf '%s end %s %s exit=%s %ss\n' "$(date '+%F %T')" "$label" "$name" "$code" "$(( $(date +%s) - start ))" >> "$log"

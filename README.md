@@ -150,6 +150,7 @@ scripts/land-check.sh feature/search
 | 75 | Parked, not your turn. Commit and wait. |
 | 124 | Hung past the time limit. Find the cause. |
 | 143 | Aborted. Run it again. |
+| 2 | Usage error, or a runway without an owner. Inspect it. |
 | other | The command's own result |
 
 | Setting | Default | |
