@@ -41,7 +41,7 @@ The tower reads your rules, CI and branches, backs up what isn't merged, and ask
 </tr>
 </table>
 
-### What people use it for
+### What it's for
 
 Anything too big for one agent that can be split and verified:
 
