@@ -5,6 +5,7 @@
 - `git status -sb` in the base checkout. If someone else has uncommitted changes that overlap, wait. Do not stash their work.
 - `git fetch`, so you compare against the real base and not a stale local copy.
 - `"$WATCHTOWER_SKILL_DIR/scripts/land-check.sh" <branch>`.
+- The area is cleared on the board. `references/review.md` covers getting it there.
 - Check that CI on the current base is green or that you know why not. A red base hides new failures.
 
 ## What "ready" means
@@ -44,7 +45,7 @@ git cherry-pick <candidate-1> <candidate-2>
 
 Resolve the conflicts, then run one full verification. Confirm that candidate workers have stopped before removing them from the gate and adding the batch worktree. `--force` bypasses the gate's active-area limit; it does not stop workers or increase machine capacity. Avoid it while candidates are still running. If the batch is green, fast-forward the agreed local target; push once only when authorized.
 
-Afterwards, tell the sessions their work is on the base. Their branches now differ from what landed, so they must start any follow-up from the new base.
+Mark each with `tower-area.sh mark <id> land --sha <its commit on the base>`. Afterwards, tell the sessions their work is on the base. Their branches now differ from what landed, so they must start any follow-up from the new base.
 
 ## Local preparation or publication
 
@@ -66,4 +67,4 @@ When fixing a red base:
 
 ## Cleanup
 
-Confirm the owning session has stopped. Inspect tracked and untracked changes and verify every candidate commit is preserved. Prefer `git worktree remove` without force and `git branch -d`. After a cherry-pick or rebase, keep a backup ref and check that the actual changes survived before deleting the original branch; a failed safe delete is a reason to inspect, not automatically use `-D`. Update `active.list` and keep `handoff.md` current.
+Confirm the owning session has stopped. Inspect tracked and untracked changes and verify every candidate commit is preserved. Prefer `git worktree remove` without force and `git branch -d`. After a cherry-pick or rebase, keep a backup ref and check that the actual changes survived before deleting the original branch; a failed safe delete is a reason to inspect, not automatically use `-D`. Keep `handoff.md` current.

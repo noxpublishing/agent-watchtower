@@ -33,8 +33,12 @@ home=$(git rev-parse --git-common-dir); home=$(cd "$home" && pwd)/watchtower
 [ -f "$home/brief.md" ] && pass "init writes the brief" || fail "init writes the brief"
 
 # Gate
+"$s/tower-capacity.sh" set --flying 3 >/dev/null
 "$s/tower-gate.sh" add one two three >/dev/null
-"$s/tower-gate.sh" add four >/dev/null 2>&1; check "gate refuses a fourth" "$?" 1
+"$s/tower-gate.sh" add four >/dev/null 2>&1; check "gate refuses past a limit you set" "$?" 1
+"$s/tower-capacity.sh" set --flying off >/dev/null
+"$s/tower-gate.sh" add four >/dev/null; check "without a limit the gate has no ceiling" "$?" 0
+"$s/tower-gate.sh" rm four >/dev/null
 (cd ../four && "$s/runway.sh" parked true >/dev/null); check "parked worktree gets 75" "$?" 75
 (cd ../four && "$s/runway.sh" parked true | grep -q PARKED); check "parked message tells what to do" "$?" 0
 
@@ -63,6 +67,9 @@ check "priority overtakes the queue" "$(tr '\n' ' ' < "$order2")" "urgent normal
 
 # Concurrent admission, actual overlapping checks and process-tree cleanup.
 "$root/tests/runtime.sh"; check "runtime regressions" "$?" 0
+
+# The flight plan and the boards that read it.
+"$root/tests/flight.sh"; check "flight plan and board" "$?" 0
 
 # Status and landing report
 "$s/tower-status.sh" | grep -q 'area/two' ; check "status lists worktrees" "$?" 0

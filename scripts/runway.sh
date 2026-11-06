@@ -2,7 +2,8 @@
 # Run an expensive verification under the tower's rules.
 #   runway.sh [--priority] <label> <command> [args...]
 #
-# At most TOWER_RUNWAYS jobs run at once (default 3), first come first served.
+# Jobs share the runways first come, first served. How many is yours to set:
+# tower-capacity.sh set --runways <n>, or TOWER_RUNWAYS. Unset, one per four cores.
 # Exit codes: the command's own code, or
 #   75  parked: this worktree is not on the active list. Do not retry; wait for a call.
 #       If nobody is acting as the tower, ask the human.
@@ -16,14 +17,14 @@ here=$(cd "$(dirname "$0")" && pwd)
 priority=5
 if [ "${1:-}" = "--priority" ]; then priority=0; shift; fi
 if [ "$#" -lt 2 ]; then
-  sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//' >&2
+  sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//' >&2
   exit 2
 fi
-label=$1; shift
+label=$(clean_text "$1"); shift
 
 home=$(tower_home) || exit 2
 name=$(worktree_name)
-runways=${TOWER_RUNWAYS:-3}
+runways=$(runway_limit "$home")
 limit=${TOWER_TIMEOUT:-5400}
 # Seconds allowed for TERM before killing the entire command process group.
 kill_grace=${TOWER_KILL_GRACE:-20}

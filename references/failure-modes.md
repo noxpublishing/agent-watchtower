@@ -1,12 +1,12 @@
 # Failure modes
 
-All of these happened in one real run. Each cost hours, or a red main branch.
+All of these happened in real runs. Each cost hours, or a red main branch.
 
-## Too many flying at once
+## More flying than this machine carries
 
-**Looks like:** Everyone reports "waiting for a slot". Limits drain fast while little lands.
+**Looks like:** Everyone reports "waiting for a slot". Limits drain fast while little lands. The board shows high numbers behind the base.
 **Why:** Machine slots stay fixed, and each landing makes all other candidates stale. Twenty sessions are not four times faster than five. They rebase more.
-**Do:** Park down to three. Land before starting anything new.
+**Do:** Show the human the numbers and `tower-capacity.sh`. Suggest parking down and landing before starting anything new. How many is their call.
 
 ## A hung check holds a slot
 
@@ -51,6 +51,12 @@ All of these happened in one real run. Each cost hours, or a red main branch.
 
 **Looks like:** A pre-check says no conflicts, then a real cherry-pick has twelve. In this case a shell loop did not split its list, so it compared nothing.
 **Do:** Trust the real operation in a throwaway worktree over a clever pre-check. Test your check against a pair you know conflicts.
+
+## A tower that forgot what is done
+
+**Looks like:** After a compaction the tower starts an area again that already landed, or re-reviews finished work.
+**Why:** Conversation memory does not survive compaction, and a confident summary can be wrong.
+**Do:** After any compaction read the board and `git log` first. Landed and cleared are facts on the board. The commits exist even if you no longer remember them.
 
 ## Editing a script that is running
 

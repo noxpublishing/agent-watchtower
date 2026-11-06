@@ -1,6 +1,6 @@
 # Working with your tool
 
-The tower needs five things: start a session in its own worktree, message it, hear when it finishes, list what is running, and see usage. Tools name these differently. Look at what you actually have before you plan, and never assume a tool exists.
+The tower needs six things: start a session in its own worktree, message it, hear when it finishes, list what is running, see usage, and show the human the board. Tools name these differently. Look at what you actually have before you plan, and never assume a tool exists.
 
 ## Codex
 
@@ -21,13 +21,16 @@ When the session exposes collaboration tools, use their actual schemas. Common c
 
 These are capabilities observed in this environment, not a mandatory Codex API. Use only the names and schemas actually listed by the client. The [official hosted multi-agent reference](https://developers.openai.com/api/docs/guides/responses-multi-agent) documents these collaboration primitives; a client can expose a different interface. Do not assume that Claude's `get_usage`, `start_session` or `detach_session` exists.
 
-Read the limit's counting convention. Four total concurrent agent slots including the tower allow at most three workers; a limit explicitly counting only subagents already excludes the tower, so do not subtract it twice. Reduce capacity for other active agents and use serial areas if delegation is unavailable. `TOWER_MAX_ACTIVE` controls gate entries, while `TOWER_RUNWAYS` controls checks: neither creates agent capacity or stops a worker from editing.
+The client's own limit stays in force: `agents.max_concurrent_threads_per_session` excludes the primary, while a limit counting total agents includes the tower, so read how yours counts and do not subtract twice. Reduce capacity for other active agents and use serial areas if delegation is unavailable. The person's flying limit controls gate entries and runways control checks: neither creates agent capacity or stops a worker from editing. If they want more than the client allows, tell them which setting it is. Do not change it yourself.
+
+**Classes:** `tower-install.sh codex` installs `~/.codex/agents/tower-*.toml`. They keep the user's model and set effort only. Spawn by name when the tool lists them.
+
+**Board:** Codex has no side panel. Run `tower-deck.sh` for a live deck in its own pane or window, or `tower-board.sh --html --watch` in the background and give the human the printed `file://` address for a browser or the in-app browser. Mirror the block in the plan tool when exposed, and include `tower-board.sh --plain` in a progress message at real milestones. Stop the watcher at the end of the shift.
 
 Subagents share the filesystem. Create each worktree explicitly before dispatching:
 
 ```bash
-git worktree add -b area/search ../project-search <base>
-"$WATCHTOWER_SKILL_DIR/scripts/tower-gate.sh" add project-search
+"$WATCHTOWER_SKILL_DIR/scripts/tower-area.sh" launch search
 ```
 
 In the task text give the resolved absolute worktree path and require shell calls to set that working directory. Do not add a nonexistent `workdir` argument to an agent-spawn tool. Specify file or module ownership, acceptance checks, the shared brief, and the absolute skill path. State that other workers share the repository: preserve their edits and coordinate shared contracts. Use unique worktree folder names because the scripts identify worktrees by basename.
@@ -50,7 +53,8 @@ Tool names change between versions. Check what your session actually lists.
 
 | Need | Tool |
 | --- | --- |
-| Start a session | `start_session` with `use_worktree: true`, a short `name`, a `source_branch` when it builds on another branch |
+| Start a session | `start_session` with `use_worktree: true`, a short `name`, a `model`, a `source_branch` when it builds on another branch. Run `tower-area.sh launch <id> --native` first; the worker runs `bind` |
+| Start a subagent | `tower-area.sh launch <id>`, then the Agent tool with `subagent_type` = the class as listed, `description` = the area id, and the absolute worktree path in the brief. No `isolation`, since the worktree exists. A subagent reports back when it finishes; with no way to message it, a return means a new one with the defects in its brief |
 | Message | `SendMessage` with the session ID |
 | Hear when done | Notes arrive by themselves for sessions you started; `notify_when_idle` for others |
 | List | `list_sessions` with `linked: true` |
@@ -59,20 +63,22 @@ Tool names change between versions. Check what your session actually lists.
 
 A tower works in the base checkout because it lands there, so start a replacement with `use_worktree: false`.
 
+**Board:** the plugin draws a bar above the prompt and opens the Fleet panel beside the chat by itself once a plan exists. `/tower-board` toggles it, and the `show_board` tool opens it and reports what it can see. It lists subagents that fly no area, and writes each worker's context fill, tokens and estimated cost to its worktree block. Costs are list prices times reported tokens, so they are estimates. Only one plugin can draw that row at a time: while another plugin's bar is active, for example from a workflow with its own subagents, Watchtower's stays hidden until that one is dismissed.
+
 ## Claude Code in a terminal
 
-Use the Agent tool with `isolation: "worktree"` for work that returns in this conversation. For long-lived independent sessions, create the worktree yourself, fill in `assets/session-prompt.md`, and start one interactive `claude` per terminal or tmux pane. `claude -p` also works for a job with one result, but you cannot talk to it afterwards.
+Use the Agent tool with `isolation: "worktree"` for work that returns in this conversation. For long-lived independent sessions, use `tower-area.sh launch`, fill in `assets/session-prompt.md`, and start one interactive `claude` per terminal or tmux pane. In fullscreen rendering the Fleet panel docks beside the transcript; otherwise `tower-deck.sh` opens the live deck in a pane or window. `claude -p` also works for a job with one result, but you cannot talk to it afterwards.
 
 ```bash
-git worktree add -b area/search ../search main
-tmux new-window -c ../search -n search claude
+"$WATCHTOWER_SKILL_DIR/scripts/tower-area.sh" launch search
+tmux new-window -c ../project-search -n search claude
 ```
 
 Terminal sessions cannot reach each other without a shared channel. Use the `status/` folder that `tower-init.sh` creates in the tower state directory: each session writes `status/<name>.md` when it has a result, and resuming a stopped session works with `claude --continue` in its worktree.
 
 ## Other agents (Cursor and others)
 
-The scripts are plain bash and git, so they work anywhere. Point `AGENTS.md` or the equivalent at the brief. Use whichever way that tool has to run separate sessions, one worktree each.
+The scripts are plain bash and git, so they work anywhere. Point `AGENTS.md` or the equivalent at the brief. Use whichever way that tool has to run separate sessions, one worktree each. The board's terminal and browser views work the same.
 
 ## No background sessions at all
 
@@ -86,5 +92,5 @@ Some tools limit how many messages sessions may receive per human message, or pa
 
 - Without `setsid` (default macOS), `runway.sh` falls back to perl, then python3.
 - `land-check.sh` needs git 2.38 or newer for the merge simulation, and works without it.
-- `tower-status.sh` shows CI only if `gh` is installed and logged in.
+- The board shows CI only if `gh` is installed and logged in, from a note refreshed at most once a minute.
 - If the state directory must be shared beyond one clone, set `TOWER_HOME`.

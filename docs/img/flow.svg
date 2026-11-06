@@ -20,7 +20,7 @@
   </g>
   <g text-anchor="middle">
     <text x="124" y="176" class="t" fill="#D5DCE8">Parked</text><text x="124" y="204" class="s">work committed,</text><text x="124" y="225" class="s">costs nothing</text>
-    <text x="340" y="176" class="t" fill="#FFC56B">Flying</text><text x="340" y="204" class="s" style="fill:#E0C79A">in its own worktree,</text><text x="340" y="225" class="s" style="fill:#E0C79A">three at a time</text>
+    <text x="340" y="176" class="t" fill="#FFC56B">Flying</text><text x="340" y="204" class="s" style="fill:#E0C79A">in its own worktree,</text><text x="340" y="225" class="s" style="fill:#E0C79A">as many as you set</text>
     <text x="556" y="176" class="t" fill="#D5DCE8">Runway</text><text x="556" y="204" class="s">heavy checks queue,</text><text x="556" y="225" class="s">with a time limit</text>
     <text x="772" y="176" class="t" fill="#D5DCE8">Candidate</text><text x="772" y="204" class="s">honest commit:</text><text x="772" y="225" class="s">checked and not</text>
     <text x="965" y="176" class="t" fill="#FFC56B">Tower</text><text x="965" y="204" class="s" style="fill:#E0C79A">checks,</text><text x="965" y="225" class="s" style="fill:#E0C79A">rebases</text>

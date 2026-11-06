@@ -2,7 +2,9 @@
 # Decide who may fly. Everyone else stays in the holding pattern.
 #   tower-gate.sh list
 #   tower-gate.sh add [--force] <worktree-folder-name>...
-#       refuses unknown worktrees and anything beyond TOWER_MAX_ACTIVE (default 3)
+#       refuses unknown worktrees, and anything past the limit if you set one:
+#       tower-capacity.sh set --flying <n>, or TOWER_MAX_ACTIVE. No limit by default.
+#   tower-gate.sh room                            exit 0 if one more may fly
 #   tower-gate.sh rm  <worktree-folder-name>...
 #   tower-gate.sh off                             remove the gate: everyone may run
 # The folder of the base checkout does not count toward the limit.
@@ -11,20 +13,26 @@ here=$(cd "$(dirname "$0")" && pwd)
 . "$here/lib.sh"
 home=$(tower_home) || exit 2
 list="$home/active.list"
-max=${TOWER_MAX_ACTIVE:-3}
-base_folder=$(basename "$(git worktree list --porcelain 2>/dev/null | sed -n '1s/^worktree //p')")
+max=$(flying_limit "$home")
+base_folder=$(base_checkout_folder)
 # Reading needs no lock, so a stuck writer cannot hide the state.
-if [ "${1:-list}" != "list" ]; then gate_lock "$home" || exit 2; fi
+case "${1:-list}" in list|room) ;; *) gate_lock "$home" || exit 2 ;; esac
 
 count() { active_entries "$home" | grep -vxF "$base_folder" | grep -c . || true; }
 
 case "${1:-list}" in
   list)
     if [ -f "$list" ]; then
-      echo "active ($(count)/$max):"
-      active_entries "$home" | sed 's/^/  /'
+      echo "active ($(count)/${max:-no limit}):"
+      active_entries "$home" | sed -e "s/^$base_folder\$/$base_folder (base checkout, not counted)/" -e 's/^/  /'
     else
       echo "no gate: every worktree may run"
+    fi
+    ;;
+  room)
+    if [ -n "$max" ] && [ "$(count)" -ge "$max" ]; then
+      echo "refused: your limit is $max active. Land or park one, or raise it with tower-capacity.sh set --flying <n>." >&2
+      exit 1
     fi
     ;;
   add)
@@ -38,8 +46,8 @@ case "${1:-list}" in
         echo "refused: no worktree folder named $item. Check tower-status.sh, or use --force if it is about to exist." >&2
         exit 1
       fi
-      if [ "$force" -eq 0 ] && [ "$(count)" -ge "$max" ]; then
-        echo "refused: $item. Already $max active. Land or park one first, or use --force for a short integration run." >&2
+      if [ "$force" -eq 0 ] && [ -n "$max" ] && [ "$(count)" -ge "$max" ]; then
+        echo "refused: $item. Your limit is $max active. Land or park one, raise it with tower-capacity.sh set --flying <n>, or use --force for a short integration run." >&2
         exit 1
       fi
       printf '%s\n' "$item" >> "$list"
@@ -60,5 +68,5 @@ case "${1:-list}" in
     done
     ;;
   off) rm -f "$list"; echo "gate removed" ;;
-  *) sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2 ;;
+  *) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2 ;;
 esac

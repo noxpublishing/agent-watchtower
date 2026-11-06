@@ -4,7 +4,7 @@
 
 Change nothing until you know what exists.
 
-1. `git fetch` when a remote is configured and reachable, then `"$WATCHTOWER_SKILL_DIR/scripts/tower-status.sh"`. For an offline or remote-less repository, record that remote freshness is unverified.
+1. `git fetch` when a remote is configured and reachable, then `"$WATCHTOWER_SKILL_DIR/scripts/tower-board.sh" --plain`. Worktrees nobody planned are listed there. For an offline or remote-less repository, record that remote freshness is unverified.
 2. For each worktree: read the last commits and `git status --short`. Note what is finished, half done, or abandoned.
 3. Find the sessions: list them in your tool, or ask the human which belong to what. A session stopped by a usage limit keeps its conversation and can usually be resumed. Sessions stopped long ago are often cheaper to replace with a fresh one and a short brief.
 4. `"$WATCHTOWER_SKILL_DIR/scripts/tower-overlap.sh"` shows which branches touch the same files.
@@ -35,6 +35,8 @@ Put each branch into one of three piles:
 - **Stale:** already on the base, replaced, or abandoned. Show this list to the human. Leave the backup ref either way.
 
 Pairs with heavy overlap should not fly together.
+
+Put what you keep on the board, so the human sees it: `tower-area.sh add <id> "<title>" --worktree <folder> --branch <branch>`. An area added this way counts as flying only once it is on the gate.
 
 ## The base is already red
 

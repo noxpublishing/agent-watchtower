@@ -9,7 +9,7 @@ Every session reads this first. Keep it short and current.
 - Do not push, deploy, or touch real providers, accounts, payments or production.
 - Never revert what is on `<base>`. After a rebase, check that nothing was undone.
 - Write the failing test first when fixing a bug, and run checks appropriate to the change. Do not weaken an assertion to get green.
-- Report results, not progress. No "still waiting" messages: every wake-up costs tokens.
+- Message the tower with results only. Progress goes to the board. No "still waiting" messages: every wake-up costs tokens.
 
 ## Verification
 
@@ -46,14 +46,18 @@ Anything numbered or shared gets a reserved range here, before anyone writes it.
 ## Execution limits
 
 - Available agent slots: `<total, including tower and any other active agents>`.
-- Active worker limit: `<at most three and within remaining capacity>`.
-- Concurrent checks: `<TOWER_RUNWAYS, distinct from agent slots>`.
+- Active worker limit: `<what the person chose, or none; within remaining agent capacity>`.
+- Concurrent checks: `<runways the person chose, distinct from agent slots>`.
 - Budget/usage: `<user-supplied stop line; unavailable metrics marked unavailable>`.
 - Tower authorization: `<local integration, remote push and deployment separately>`.
 
 ## Delivering a candidate
 
-Commit message states: what it does, what was fixed on the way, what was verified **on which commit**, what was not verified. Then send the tower: branch, commit, base, result, open questions.
+Commit message states: what it does, what was fixed on the way, what was verified **on which commit**, what was not verified. Write the full report to your report path, then run `"<absolute skill directory>/scripts/tower-area.sh" deliver DONE|CONCERNS|BLOCKED|NEEDS_CONTEXT "<one line>"`. Send the tower only: status, branch, commit, one line of results, open questions, report path.
+
+## Progress
+
+`"<absolute skill directory>/scripts/tower-area.sh" step <done> <total> "<current step>"`. It draws the board, wakes nobody and never fails your work.
 
 ## Asking
 

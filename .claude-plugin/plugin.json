@@ -1,0 +1,10 @@
+{
+  "name": "watchtower",
+  "version": "2.0.0",
+  "description": "Flight board for parallel agents and worktrees: fleet bar above the prompt, flight strips in a side panel, worker classes.",
+  "author": { "name": "NOX Publishing", "url": "https://github.com/noxpublishing" },
+  "homepage": "https://github.com/noxpublishing/agent-watchtower",
+  "repository": "https://github.com/noxpublishing/agent-watchtower",
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img" aria-label="Watchtower: a lit tower watches three agents land on the main branch while five others wait parked in a holding ring.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img" aria-label="Watchtower: a lit tower watches agents land on the main branch while others wait parked in a holding ring.">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#0A0F1C"/><stop offset="1" stop-color="#121A2C"/>
@@ -50,7 +50,7 @@
     <circle r="9"><animateMotion dur="6s" begin="-2s" repeatCount="indefinite" path="M260,350 C350,350 400,480 500,516"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.08;.92;1" dur="6s" begin="-2s" repeatCount="indefinite"/></circle>
     <circle r="9"><animateMotion dur="6s" begin="-4s" repeatCount="indefinite" path="M400,350 C490,350 550,480 660,516"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.08;.92;1" dur="6s" begin="-4s" repeatCount="indefinite"/></circle>
   </g>
-  <text x="72" y="330" font-size="19" fill="#FFC56B">3 flying</text>
+  <text x="72" y="330" font-size="19" fill="#FFC56B">flying</text>
 
   <!-- main -->
   <line x1="64" y1="520" x2="1216" y2="520" stroke="#3DDC97" stroke-width="4" stroke-linecap="round"/>

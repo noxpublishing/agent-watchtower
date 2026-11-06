@@ -8,19 +8,16 @@ Updated: <date>. Keep this current during the shift, so a crash or limit stop lo
 
 ## Rules and limits
 
-- Active areas at once: <worker capacity after reserving the tower; gate and runway limits separately>
+- Active areas at once: <what the person chose with tower-capacity.sh, within client capacity after reserving the tower>
 - Stop line: <user-supplied limit; mark usage unavailable if the client cannot measure it>
 - Allowed without asking: <existing authorization for local integration, push and deployment separately>
 - Never: <deploy, real providers, ...>
 
-## Block order
+## Flight plan
 
-1. Done: <...>
-2. Flying now: <...>
-3. Next: <...>
-4. Later: <...>
+The plan and each area's state are on the board: `tower-board.sh --plain`. Trust it and `git log` over any memory. Rulings so far: `tower-area.sh rulings`.
 
-Order constraints: <what must land before what>.
+Order constraints the plan does not show: <...>.
 
 ## Sessions
 
