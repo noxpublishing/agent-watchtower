@@ -515,7 +515,7 @@ worktree_box() {
   box_line "$(clip "$meta$flags" "$inner")" "$D"
   if [ "$tokens" -gt 0 ] || [ -n "$model" ]; then
     usage=
-    [ -z "$model" ] || usage="$(printf '%s' "$model" | sed -E 's/^claude-//; s/-([0-9]+)-([0-9]+)$/ \1.\2/; s/-([0-9]+)$/ \1/')"
+    [ -z "$model" ] || usage="$(printf '%s' "$model" | sed -E 's/^claude-//; s/-([0-9]+)-([0-9]+)$/ \1.\2/; s/-([0-9]+)$/ \1/' | awk '{ print toupper(substr($0, 1, 1)) substr($0, 2) }')"
     [ -z "$effort" ] || usage="$usage · $effort"
     if [ "$ctx_max" -gt 0 ]; then usage="$usage · ctx $(( ctx * 100 / ctx_max ))%"; fi
     [ "$tokens" -eq 0 ] || usage="$usage · $(human_tokens "$tokens")"

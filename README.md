@@ -1,24 +1,38 @@
 <p align="center">
-  <img src="docs/img/hero.svg" alt="Watchtower: a lit tower watches agents land on main while the others wait parked" width="100%">
+  <img src="docs/img/hero.svg" alt="Watchtower: every worktree and agent on one screen, each landing on main in turn" width="100%">
 </p>
 
 <p align="center">
   <a href="https://github.com/noxpublishing/agent-watchtower/actions/workflows/test.yml"><img src="https://github.com/noxpublishing/agent-watchtower/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-3DDC97" alt="MIT license"></a>
-  <img src="https://img.shields.io/badge/Claude%20Code-skill-FFB454" alt="Claude Code skill">
-  <img src="https://img.shields.io/badge/Codex-skill-3DDC97" alt="Codex skill">
-  <img src="https://img.shields.io/badge/needs-bash%20%2B%20git-7C8AA2" alt="Needs bash and git">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4fc48e" alt="MIT license"></a>
+  <img src="https://img.shields.io/badge/Claude%20Code-plugin-e3a64a" alt="Claude Code plugin">
+  <img src="https://img.shields.io/badge/Codex-skill-6cb6ff" alt="Codex skill">
+  <img src="https://img.shields.io/badge/needs-bash%20%2B%20git-98a2b3" alt="Needs bash and git">
 </p>
 
 <p align="center">
-  <b>One session becomes the tower. As many agents fly as you choose. Finished work lands on main, one at a time, and you watch all of it live.</b>
+  <b>Split a big job across coding agents in git worktrees, watch all of them live, and land their work on main one at a time.</b>
 </p>
 
-```bash
-git clone https://github.com/noxpublishing/agent-watchtower ~/.claude/skills/watchtower
+Watchtower turns one session into a tower. It plans the work, starts a worker per worktree, reads what comes back, and lands it. You choose how many fly and make the decisions that are yours. The rest of the time you can see everything without asking.
+
+## Install
+
+**Claude Code**, at the prompt of a terminal session:
+
+```text
+/plugin install watchtower --marketplace noxpublishing/agent-watchtower
 ```
 
-That one folder is the skill, the flight board and the worker classes for Claude Code. For Codex, or both:
+From a shell:
+
+```bash
+claude plugin install watchtower --marketplace noxpublishing/agent-watchtower
+```
+
+In the desktop app, click + next to the prompt box, then Plugins, Add marketplace with `noxpublishing/agent-watchtower`, then Add plugin.
+
+**Codex**, or both clients from one checkout that `git pull` keeps current:
 
 ```bash
 git clone https://github.com/noxpublishing/agent-watchtower ~/agent-watchtower
@@ -28,38 +42,125 @@ git clone https://github.com/noxpublishing/agent-watchtower ~/agent-watchtower
 ~/agent-watchtower/scripts/tower-install.sh codex
 ```
 
-Use `all` instead of `codex` for both. Installing links, so `git pull` updates it. In the next Codex turn, invoke `$watchtower`. See [client capabilities](references/harness.md#codex) and [how to evaluate it](references/evaluation.md).
+Use `all` instead of `codex` to also link it into `~/.claude/skills`. Pick one way per client, so Claude Code does not load it twice. Then start a new session.
 
-<p align="center">
-  <img src="docs/img/board.png" alt="The board: cost, tokens and time, a bar with one slot per worktree, then each worktree as a block with its progress and its agent, most urgent first" width="100%">
-  <br><sub>The browser view, from a demo repository. Claude Code shows the same worktrees in its side panel.</sub>
-</p>
+## Start
 
-## Start it
+Open any repository or empty folder and say:
 
-Install once, open your agent in any repository or empty folder, and say what you want. Mention *watchtower*, or type `/watchtower` if your tool has slash commands.
+> Set up watchtower. I want to `<your goal>`.
 
-<table>
-<tr><th width="50%">Starting something new</th><th width="50%">Already have a project</th></tr>
-<tr>
-<td>
+`watchtower-setup` reads the repository first and works out whether this is a new project, an existing one or a takeover of stalled work. It asks only what it could not find: the goal, what done means, what it may do alone, and how many agents should fly. It writes a flight plan, and nothing starts until you confirm it.
 
-> Use watchtower. I want to build `<your idea or plan>`. Set up the foundation first, split the rest into areas, and show me the order before you start.
-
-The tower has one session lay the foundation: structure, test command, CI and shared contracts. Parallel agents on an empty repository would each invent their own. Then the areas fly in blocks.
-
-</td>
-<td>
+Already know what you want? Skip the interview:
 
 > Use watchtower on this repo. Goal: `<what should be true at the end>`. Look at what's here, including open branches, and propose the order.
 
-The tower reads your rules, CI and branches, backs up what isn't merged, and asks only what is really yours to decide. Then it starts the first block.
+## What you see
+
+Nobody has to report progress to you. Workers write it to a shared state folder with one silent command, and every view reads that folder. Watching wakes no agent and costs no tokens.
+
+### In Claude Code
+
+A bar above the prompt shows the whole fleet: one slot per worktree, how many run, how many landed.
+
+<p align="center"><img src="docs/img/bar.svg" alt="The bar above the prompt: a state dot, a progress bar with one slot per worktree, running and landed counts, the percentage and a working avatar" width="100%"></p>
+
+The Fleet panel opens beside the chat once a plan exists, and `/tower-board` toggles it. Worktrees come first, most urgent on top, each with the agents working in it. Agents with no worktree of their own, such as a reviewer, get their own list.
+
+<table>
+<tr>
+<td width="50%"><img src="docs/img/panel.svg" alt="The Fleet panel: cost, tokens and time on top, then each worktree as a block with its avatar, progress and agent, most urgent first"></td>
+<td>
+
+**Top:** estimated cost, tokens and time for the whole fleet.
+
+**Each worktree:** its name and state, the task, steps done, the step in progress, commits ahead and behind the base, uncommitted files, a running check.
+
+**Each agent:** class, model, effort, context fill, tokens, cost and time.
+
+**Below:** areas still planned, areas landed, and worktrees nobody planned, which a takeover needs to see.
+
+A question that waits for you shows in red at the top of the list.
 
 </td>
 </tr>
 </table>
 
-### What it's for
+### In a terminal, or beside Codex
+
+```bash
+scripts/tower-deck.sh
+```
+
+This opens a full-screen live deck: a pane on the right in tmux, a window of its own on macOS. Keys: `q` quit, `l` landed, `c` compact, `j` and `k` scroll.
+
+<p align="center"><img src="docs/img/deck.png" alt="The terminal deck: totals, a fleet bar, and one framed box per worktree with its progress and a small text face for its agent" width="82%"></p>
+
+### In a browser
+
+`scripts/tower-board.sh --html --watch` keeps a local page current, with no server. It prints the address.
+
+<details>
+<summary>See the page</summary>
+<p align="center"><img src="docs/img/board.png" alt="The browser page: totals, a fleet bar and one block per worktree" width="82%"></p>
+</details>
+
+<sub>All pictures show a demo fleet. The panel and the bar are the plugin's own drawings, and the deck is the script's real output.</sub>
+
+## How a shift runs
+
+<p align="center"><img src="docs/img/flow.svg" alt="The flow: interview, flight plan, fly in worktrees, review, land on main. Defects go back to the worker, and decisions that are yours come to you." width="100%"></p>
+
+1. **Interview.** The setup skill reads the repository and asks what is open. A new project gets a spec and a foundation area first, because parallel agents on an empty repository each invent their own structure.
+2. **Flight plan.** Each area gets a worker class, its dependencies and the files it owns. A preflight refuses two areas owning the same path without an order between them, dependency cycles and placeholder titles.
+3. **Fly.** `tower-area.sh launch` creates the worktree and branch and opens the gate. Expensive checks wait in a shared queue with a time limit, so a hung test stops itself and says so.
+4. **Review.** A worker's report is a claim. The tower reads the diff, or sends a read-only inspector that never saw the work. Defects go back with a precise list. After two returns the tower re-plans or asks you.
+5. **Land.** Fast-forward only. `mark land` refuses a commit that is not on the base or is no newer than where the area started. After a landing the next area flies.
+
+The plan lives in `.git/watchtower`, shared by all worktrees and impossible to commit. When a long conversation gets compacted, the board and `git log` still say what is done, so finished work is not started twice.
+
+## You set the fleet size
+
+No number is built in. `tower-capacity.sh` reads your cores, memory and load and suggests one. You pick any number, or no limit.
+
+```text
+machine: 12 cores, 16 GB RAM, 4 GB available, load 3.1
+limits:  flying no limit, runways 3
+suggest: up to 6 flying, 3 runways
+         estimate: 4 GB for the system, 2 GB per heavy check, 1 GB per agent
+```
+
+The number worth watching is how many candidates need another rebase after each landing. Every landing makes the others stale, so twenty agents are not twenty times faster than one. Your client's own agent limit still applies, and the tower names it instead of working around it.
+
+## Workers
+
+Each area gets the cheapest class that should get it right the first time. In Claude Code a class sets model and effort. In Codex it keeps your model and sets effort. The body shape is the class, and what the avatar does is the state: it works, reads along in review, cheers once landed, sleeps while paused and waves when it needs you.
+
+<p align="center"><img src="docs/img/faces.svg" alt="The avatars: one body shape per worker class, one kind of motion per state" width="100%"></p>
+
+| Class | Claude Code | For |
+|---|---|---|
+| `ace` | Fable, high | The hardest problems. A reserve, not a default. |
+| `scout` | Opus, xhigh | Finding out: unfamiliar code, unclear root cause. |
+| `freighter` | Opus, high | Delicate work with a clear approach: multi-file changes, migrations. |
+| `liner` | Opus, medium | Standard features and fixes with clear requirements. |
+| `prop` | Sonnet, low | Nothing left to figure out: renames, config, boilerplate. |
+| `tower-inspector` | Opus, high | Reads a candidate cold before it lands. Changes nothing. |
+
+Design stays with the tower. Workers do not invent what a user will see.
+
+## The seven laws
+
+1. **You set the fleet size.** Your machine, your limits, your call.
+2. **Only the tower lands.** One writer on the base branch means one place that knows its state.
+3. **Heavy checks use the runway.** A shared queue with a time limit.
+4. **Reports are claims, evidence decides.** "Landed" on the board means the script found the commit on the base.
+5. **Check your own landings hardest.** A fix that passes alone can break its neighbours. CI comes before the next landing.
+6. **Decide routine, record it, ask the rest.** Naming and test approach get decided and logged. Law, money, accounts, publishing and deletion go to you, as options.
+7. **Waiting is not reporting.** Every wake-up costs tokens. Progress goes to the board, messages carry results.
+
+## What it's for
 
 Anything too big for one agent that can be split and verified:
 
@@ -69,99 +170,15 @@ Anything too big for one agent that can be split and verified:
 | **A big feature across the stack** | *Add `<feature>` across API, app and docs. You orchestrate.* |
 | **A backlog** | *Work through these 15 issues. Group the ones that touch the same files.* |
 | **A migration or large refactor** | *Move all modules from `<old>` to `<new>`, in batches, with main green the whole time.* |
-| **Quality work in many places** | *Raise test coverage in the weakest modules, one area per agent.* |
 | **Stalled agents and old branches** | *Take over these worktrees and get what's worth keeping onto main.* |
 | **A red main and a pile of work** | *CI is red and six branches are waiting. Sort this out.* |
 | **Sessions stopped by a limit** | *Limits are back. Resume the stopped sessions, most important first.* |
-| **Limits draining too fast** | *We're burning through usage. Fix how the agents run.* |
 
-Not worth it for one small change a single agent can finish. Just ask that agent.
-
-## Twenty agents are not twenty times faster
-
-Starting a pile of agents feels great for about an hour. Then they queue for the same machine, every landing makes the others stale, a hung test holds a slot all afternoon, `main` turns red, and your usage limit is gone with half the work still on branches.
-
-Watchtower came out of exactly that: one real project, more than twenty parallel sessions, and at one point 16 checks waiting on 3 slots for over an hour. How many agents your machine and your limits carry is yours to decide. What has to be right is who may run, who lands, and whether you can see it.
-
-<p align="center">
-  <img src="docs/img/before-after.svg" alt="Everyone at once with nobody in charge, compared with a tower in charge" width="100%">
-</p>
-
-## How it works
-
-<p align="center">
-  <img src="docs/img/flow.svg" alt="Parked, flying, runway, candidate, tower, main. Hung checks go back. Decisions that are yours come to you. After each landing the next session is called." width="100%">
-</p>
-
-## See the whole fleet
-
-Every view reads the same state, and the scripts write that state as a side effect. Workers report progress with one silent command that wakes nobody, so watching costs no tokens and the board cannot drift from what happened.
-
-| Where | What you get |
-|---|---|
-| **Claude Code** | A bar above the prompt and the Fleet panel beside the chat, with cost, tokens and time, and every worktree as a block holding its agents. It opens by itself once there is a plan. `/tower-board` toggles it. |
-| **Any terminal, Codex** | `tower-deck.sh` opens a full-screen live deck: a tmux pane on the right, or a window of its own on macOS. Keys: `q` quit, `l` landed, `c` compact, `j`/`k` scroll. |
-| **Any browser** | `tower-board.sh --html --watch` keeps a live page current, with no server. |
-| **The tower itself** | `tower-board.sh --plain`, short on purpose, because it pays for every line. |
-
-The fleet bar has one slot per area, so you read the whole plan from one line. Every worker has a face: the body shape is its class, and what it does is its state. A `liner` types, a `scout` searches, a `freighter` lifts, a `prop` hovers. Paused workers sleep, a worker that needs you waves, and landed ones cheer. In a terminal they are small text faces like `{••}`. A worktree block shows its branch, ahead and behind, uncommitted files, steps, a running check, and each agent with model, context fill, tokens and estimated cost. Worktrees nobody planned show up too, which is what a takeover needs.
-
-## The seven laws
-
-1. **You set the fleet size.** No number is built in. `tower-capacity.sh` reads your machine and suggests one; you pick, or pick no limit.
-2. **Only the tower lands.** One writer on the base branch means one place that knows its state.
-3. **Heavy checks use the runway.** A shared queue with a time limit, so a hung test stops itself and says so.
-4. **Reports are claims, evidence decides.** The tower reads the diff and the log. "Landed" on the board means the commit is on the base, because the script checks.
-5. **Check your own landings hardest.** A fix that passes alone can break its neighbours. CI comes before the next landing.
-6. **Decide routine, record it, ask the rest.** Naming and test approach get decided and logged. Law, money, accounts, publishing and deletion go to you, as options.
-7. **Waiting is not reporting.** Every wake-up costs tokens. Progress goes to the board, messages carry results.
-
-## Start with an interview
-
-Say *set up watchtower*. `watchtower-setup` reads the repository first, works out whether this is a new project, an existing one or a takeover, and asks only what it could not find: the goal, what done means, what it may do alone, and how many should fly. Then it fills the brief and writes a flight plan you confirm before anything starts.
-
-## The right worker for each area
-
-Each area gets the cheapest class that should get it right the first time. On Claude Code a class sets model and effort; on Codex it keeps your model and sets effort.
-
-| Class | Claude Code | For |
-|---|---|---|
-| `ace` | Fable, high | The hardest problems. A reserve, not a default. |
-| `scout` | Opus, xhigh | Finding out: unfamiliar code, unclear root cause. |
-| `freighter` | Opus, high | Carrying it exactly: delicate multi-file work, migrations. |
-| `liner` | Opus, medium | Standard features and fixes with clear requirements. |
-| `prop` | Sonnet, low | Nothing left to figure out: renames, config, boilerplate. |
-
-A separate read-only `tower-inspector` reads a candidate cold before it lands, so the tower's own context stays small. Design stays with the tower: workers never invent what a user will see.
-
-## What's in the box
-
-| Script | What it does |
-|---|---|
-| `tower-capacity.sh` | Reads cores, memory and load, suggests numbers, stores your choice per repository. |
-| `tower-area.sh` | The flight plan. Preflight for ownership clashes, dependency cycles and placeholders; launch with worktree and branch; `step` and `deliver` for workers; a landing that needs evidence; a log of the tower's rulings. |
-| `tower-board.sh` | The fleet at a glance: terminal, live page, plain text or JSON. |
-| `tower-deck.sh` | Opens the live board beside your agents: a tmux pane or a window of its own. |
-| `tower-survey.sh` | What a repository can tell before anyone asks. Changes nothing. |
-| `tower-gate.sh` | Who may fly. Refuses past a limit only if you set one. |
-| `runway.sh` | Runs heavy checks first come, first served, with a time limit that also stops child processes. `--priority` lets a fix for a red main overtake. |
-| `land-check.sh` | Before landing: commits, deletions, shared infrastructure, possible secrets, and a merge simulation. |
-| `tower-overlap.sh` | Which branches touch the same files, so they don't fly together. |
-| `tower-init.sh` | Sets up shared state in `.git/watchtower`: visible to all worktrees, impossible to commit. |
-| `tower-install.sh` | Links the skill and writes the Codex worker classes. |
-
-And for the agent itself:
-
-- **[Planning](references/planning.md):** slicing, classes, a preflight before anything flies, and specs in files for a new project.
-- **[Review](references/review.md):** what counts as proof, when a cold reader takes over, and when to stop returning work.
-- **[Takeover](references/takeover.md):** adopt yesterday's stalled worktrees and sessions, including a `main` that is already red.
-- **[Landing](references/landing.md):** when a rebase is yours and when it goes back to the session, and how several candidates share one full test run.
-- **Shift change:** a very long orchestrator conversation pays for its history on every message, so a fresh one takes over from a handoff file, and after a compaction the board says what is already done.
-- **Budget:** a stop line agreed with you. Near the limit, landing goes before building.
+One small change a single agent can finish does not need any of this.
 
 ## The traps it knows about
 
-All of these really happened. [The full list](references/failure-modes.md) has what each looks like and what to do.
+Watchtower came out of one real project with more than twenty parallel sessions, and at one point 16 checks waiting on 3 slots for over an hour. All of these happened. [The full list](references/failure-modes.md) says what each looks like and what to do.
 
 > **Counters that merge wrong.** Two branches change `tables: 84` to `tables: 88`. Git sees the same edit and merges it without a word. The truth was 92.
 
@@ -169,22 +186,32 @@ All of these really happened. [The full list](references/failure-modes.md) has w
 
 > **The hotfix that passed alone.** It fixed the hanging suite and broke every suite after it, which only showed in a full run.
 
-> **Failures that move around.** Different tests fail each run, each green alone. One suite left a job behind, and 30 minutes later a timer revived it inside someone else's test.
-
-> **The pre-check that checked nothing.** A clever shell loop reported "no conflicts". It never split its list. The real cherry-pick had twelve.
+> **The pre-check that checked nothing.** A shell loop reported "no conflicts". It never split its list. The real cherry-pick had twelve.
 
 ## The scripts on their own
 
-They work without any agent, in any git repository:
+They work without any agent, in any git repository, and need only bash and git.
+
+| Script | What it does |
+|---|---|
+| `tower-survey.sh` | What a repository can tell before anyone asks. Changes nothing. |
+| `tower-capacity.sh` | Reads the machine, suggests numbers, stores your choice per repository. |
+| `tower-area.sh` | The flight plan: add, edit, preflight, launch, worker reports, review states, landing, rulings. |
+| `tower-board.sh` | The fleet at a glance: terminal, live page, plain text or JSON. |
+| `tower-deck.sh` | Opens the live board in a tmux pane or a window of its own. |
+| `tower-gate.sh` | Who may fly. Refuses past a limit only if you set one. |
+| `runway.sh` | Runs heavy checks in a queue with a time limit that also stops child processes. |
+| `land-check.sh` | Before landing: commits, deletions, shared infrastructure, possible secrets, a merge simulation. |
+| `tower-overlap.sh` | Which branches touch the same files. |
+| `tower-init.sh` | Sets up the shared state folder. |
+| `tower-install.sh` | Links the skills and writes the Codex worker classes. |
 
 ```bash
 scripts/tower-init.sh
-scripts/tower-capacity.sh
 scripts/tower-area.sh add search "Product search" --owns src/search
 scripts/tower-area.sh launch search
 scripts/runway.sh full-tests npm test
-scripts/tower-board.sh --watch
-scripts/land-check.sh area/search
+scripts/tower-deck.sh
 ```
 
 <details>
@@ -200,60 +227,43 @@ scripts/land-check.sh area/search
 
 | Setting | Default | |
 |---|---|---|
-| `TOWER_RUNWAYS` | one per four cores | Checks running at once. Better: `tower-capacity.sh set --runways <n>` |
 | `TOWER_MAX_ACTIVE` | no limit | Areas on the gate. Better: `tower-capacity.sh set --flying <n>` |
+| `TOWER_RUNWAYS` | one per four cores | Checks at once. Better: `tower-capacity.sh set --runways <n>` |
+| `TOWER_TIMEOUT` | 5400 | Seconds before a check counts as hung |
+| `TOWER_KILL_GRACE` | 20 | Seconds between TERM and KILL |
+| `TOWER_BASE` | origin's default | Base branch |
+| `TOWER_HOME` | `.git/watchtower` | State folder |
 | `TOWER_WORKTREES` | next to the repository | Where `launch` creates worktrees |
 | `TOWER_LANG` | system language | `de` or `en` for the panel and the deck |
-| `TOWER_TIMEOUT` | 5400 | Seconds before a check counts as hung |
-| `TOWER_KILL_GRACE` | 20 | Seconds between TERM and KILL before releasing a check's slot |
-| `TOWER_BASE` | origin's default | Base branch |
-| `TOWER_HOME` | `.git/watchtower` | State directory |
 
 </details>
 
 <details>
 <summary><b>Which tools does it work with?</b></summary>
 
-| | Sessions | Scripts and method |
+| | Sessions | Board |
 |---|---|---|
-| Claude Code desktop app | Starts, messages and hands over sessions directly, with bar and side panel. This is where it was developed. | Yes |
-| Claude Code in a terminal | Subagents, or one session per tmux pane. The panel docks beside the transcript in fullscreen rendering. | Yes |
-| Codex | Explicit worktree dispatch, worker classes, a live page or terminal board, local-only integration, and handoff when usage/detach APIs are absent. See [evaluation scope](references/evaluation.md). | Yes |
-| Cursor and others | Use that tool's own way of running sessions. Agent behavior not tested. | Yes |
+| Claude Code desktop app | Starts, messages and hands over sessions directly | Bar and side panel |
+| Claude Code in a terminal | Subagents, or one session per tmux pane | Bar and panel in fullscreen rendering, or the deck |
+| Codex | Explicit worktree dispatch, worker classes, handoff when usage and detach tools are absent | Deck or browser page |
+| Cursor and others | That tool's own way of running sessions. Not tested. | Deck or browser page |
 
-Tests run on Linux and macOS. See [the harness notes](references/harness.md).
-
-</details>
-
-<details>
-<summary><b>How many should I fly?</b></summary>
-
-As many as your machine and your limits carry. `tower-capacity.sh` gives a starting point from your cores and memory, and you can set any number or none. The number to watch is how many candidates need another rebase after each landing: when that climbs, more agents have stopped making you faster. Your client's own agent limit still applies; the tower names it rather than working around it.
-
-</details>
-
-<details>
-<summary><b>Isn't this just <code>git worktree</code>?</b></summary>
-
-Worktrees give each agent its own folder. They don't decide who runs, who lands, what to do with a hung test, or when to ask you, and they don't show you any of it. Watchtower is that part.
+See [the harness notes](references/harness.md).
 
 </details>
 
 ## Honest limits
 
 - It comes from one large project and has not been benchmarked. The numbers above describe that run, not a promise.
-- The side panel uses Claude Code's early-access plugin hooks, which can change between releases. The terminal and browser boards do not depend on them.
-- Codex and other clients have no drawing surface of their own, so the board lives beside them, not inside. Usage shows only where a client reports it.
-- The gate and the worker classes depend on the agent following the brief. A worker that ignores them is not physically stopped from editing.
-- It doesn't replace your tests or CI. It runs them in an order you can afford.
-- An agent following a skill can still make mistakes. The tower's own hotfix is on the list of traps for a reason.
-- An orphaned gate lock or runway directory without an owner PID fails with exit 2 and an inspection hint. It is not deleted automatically. Process cleanup covers the launched process group; a command that deliberately creates a separate session can escape it.
+- Costs are estimates: reported tokens times list prices. On a subscription you do not pay them. Codex reports no tokens to the board, so cost and context stay empty there.
+- The side panel uses Claude Code's early-access plugin hooks, tested on 2.1.318. They can change between releases. The terminal and browser boards do not depend on them.
+- Only one plugin can draw the row above the prompt at a time. While another plugin's bar is showing, this one stays hidden until that one is dismissed.
+- The gate and the worker classes depend on the agent following its brief. A worker that ignores them is not physically stopped from editing.
+- It does not replace your tests or CI. It runs them in an order you can afford.
 
 ## Contributing
 
-Bring your own failure modes: if parallel agents burned you in a way that isn't [on the list](references/failure-modes.md), open an issue or a pull request. Run `bash tests/run.sh` before you do, and `claude plugin test .` if you touch the plugin.
-
-If Watchtower saves your main branch, a star helps others find it.
+Bring your own failure modes: if parallel agents burned you in a way that isn't [on the list](references/failure-modes.md), open an issue or a pull request. Run `bash tests/run.sh` before you do, and `claude plugin test .` if you touch the plugin. [Evaluating Watchtower](references/evaluation.md) covers the rest.
 
 ## License
 

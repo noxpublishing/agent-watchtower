@@ -1,0 +1,6 @@
+{
+  "name": "agent-watchtower",
+  "owner": { "name": "NOX Publishing" },
+  "description": "Run a fleet of coding agents in git worktrees and watch all of it live.",
+  "plugins": [{ "name": "watchtower", "source": "./" }]
+}

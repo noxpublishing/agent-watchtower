@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 905 132" width="905" height="132" role="img" aria-label="The bar above the prompt: a state dot, a progress bar with one slot per worktree, running and landed counts, the percentage and a working avatar">
+<style>
+text{font-variant-numeric:tabular-nums}
+.ink{fill:#1f1f1e}.soft{fill:#6b6b68}.faint{fill:#9a9a96}.track{fill:#00000012}.box{fill:none;stroke:#00000022}.line{stroke:#00000018}
+.flying{color:#2f7fd6}.candidate,.review{color:#b56a00}.cleared,.landed{color:#2e8f66}.blocked{color:#c93a3a}.parked{color:#7c8596}.planned{color:#9aa2b1}
+.ink{fill:#ececeb}.soft{fill:#a3a3a0}.faint{fill:#7d7d7a}.track{fill:#ffffff14}.box{fill:none;stroke:#ffffff1f}.line{stroke:#ffffff17}
+.flying{color:#6cb6ff}.candidate,.review{color:#e3a64a}.cleared{color:#6fd3a6}.landed{color:#4fc48e}.blocked{color:#ef7b7b}.parked{color:#98a2b3}.planned{color:#7c8aa2}
+.fill{fill:currentColor}
+
+/* The fleet's faces: body shape by class, what they do by state. Only transform and opacity move. */
+.av .body{fill:currentColor}
+.av .arm,.av .ant,.av .stem{fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round}
+.av .ping,.av .blade{fill:currentColor}
+.av .eye{fill:#141414;transform-box:fill-box;transform-origin:center}
+.av .lens{fill:none;stroke:#141414;stroke-width:1.2}
+.av .arm{transform-box:fill-box}
+.av .arm.l{transform-origin:100% 0}
+.av .arm.r{transform-origin:0 0}
+.av .core,.av .blade,.av .ping{transform-box:fill-box;transform-origin:center}
+.av .z{fill:currentColor;font:600 7px -apple-system,sans-serif;opacity:0}
+
+/* Waiting for its turn: dim, blinks, glances around. */
+.is-planned{opacity:.72}
+.is-planned .gaze{animation:av-glance 6s ease-in-out infinite}
+.is-planned .eye{animation:av-blink 5.2s linear infinite}
+
+/* Working. Each class has its own job. */
+.is-flying .eye{animation:av-blink 3.8s linear infinite}
+
+/* liner: at the keyboard, arms typing, eyes on the work. */
+.c-liner.is-flying .core{animation:av-nod .9s ease-in-out infinite}
+.c-liner.is-flying .arm.l{animation:av-type-l .34s ease-in-out infinite}
+.c-liner.is-flying .arm.r{animation:av-type-r .34s ease-in-out infinite -.17s}
+.c-liner.is-flying .gaze{animation:av-read 2.2s ease-in-out infinite}
+
+/* scout: searching, leans left and right, antenna pinging. */
+.c-scout.is-flying .core{animation:av-lean 2.6s ease-in-out infinite}
+.c-scout.is-flying .gaze{animation:av-scan 2.6s ease-in-out infinite}
+.c-scout.is-flying .ping{animation:av-ping .8s ease-in-out infinite}
+.c-scout.is-flying .arm.l{animation:av-sway-l 1.3s ease-in-out infinite}
+.c-scout.is-flying .arm.r{animation:av-sway-r 1.3s ease-in-out infinite}
+
+/* freighter: heavy lifting, slow push up with both arms. */
+.c-freighter.is-flying .core{animation:av-heave 2.4s ease-in-out infinite}
+.c-freighter.is-flying .arm.l{animation:av-lift-l 2.4s ease-in-out infinite}
+.c-freighter.is-flying .arm.r{animation:av-lift-r 2.4s ease-in-out infinite}
+
+/* prop: hovers with its rotor spinning. */
+.c-prop.is-flying .core{animation:av-hover 1.1s ease-in-out infinite}
+.c-prop.is-flying .blade{animation:av-spin .18s linear infinite}
+.c-prop.is-flying .arm.l,.c-prop.is-flying .arm.r{animation:av-hover 1.1s ease-in-out infinite}
+
+/* ace: quick and sure, spins through problems. */
+.c-ace.is-flying .core{animation:av-turn 3.2s ease-in-out infinite}
+.c-ace.is-flying .arm.l{animation:av-type-l .5s ease-in-out infinite}
+.c-ace.is-flying .arm.r{animation:av-type-r .5s ease-in-out infinite -.25s}
+
+/* inspector: reads line by line through its lens. */
+.c-inspector.is-flying .core{animation:av-nod 2s ease-in-out infinite}
+.c-inspector.is-flying .gaze{animation:av-read 2s ease-in-out infinite}
+.c-inspector.is-flying .arm.r{animation:av-sway-r 2s ease-in-out infinite}
+
+/* Delivered: waits, tapping a raised arm. In review: reads along, nodding. */
+.is-candidate .core{animation:av-breathe 2.6s ease-in-out infinite}
+.is-candidate .gaze{transform:translate(1.2px,-1px)}
+.is-candidate .arm.r{transform:rotate(-62deg);animation:av-tap 1s ease-in-out infinite}
+.is-review .core{animation:av-nod 1.8s ease-in-out infinite}
+.is-review .gaze{animation:av-read 2.4s ease-in-out infinite}
+.is-review .arm.r{transform:rotate(-62deg)}
+
+/* Ready to land: pleased, bouncing lightly. */
+.is-cleared .eye,.is-landed .eye{transform:scale(1.35,.42)}
+.is-cleared .core{animation:av-bounce 1.4s ease-in-out infinite}
+.is-cleared .arm.l{animation:av-sway-l 1.4s ease-in-out infinite}
+.is-cleared .arm.r{animation:av-sway-r 1.4s ease-in-out infinite}
+
+/* Landed: both arms up, cheering now and then. */
+.is-landed .arm.l{transform:rotate(122deg);animation:av-cheer-l 3.6s ease-in-out infinite}
+.is-landed .arm.r{transform:rotate(-122deg);animation:av-cheer-r 3.6s ease-in-out infinite}
+.is-landed .core{animation:av-hop 3.6s ease-in-out infinite}
+
+/* Paused: asleep, deep breaths, a z floating up. */
+.is-parked .eye{transform:scale(1.2,.14)}
+.is-parked .core{animation:av-sleep 4.4s ease-in-out infinite}
+.is-parked .z1{animation:av-z 3.6s ease-out infinite}
+.is-parked .z2{animation:av-z 3.6s ease-out infinite -1.8s}
+
+/* Needs you: eyes wide, hops and waves. The one state that asks for attention. */
+.is-blocked .eye{transform:scale(1.1,1.12)}
+.is-blocked .core{animation:av-hop 1.2s ease-in-out infinite}
+.is-blocked .arm.r{transform:rotate(-124deg);animation:av-wave .7s ease-in-out infinite}
+
+@keyframes av-blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes av-glance{0%,40%,100%{transform:translateX(0)}50%,62%{transform:translateX(1.4px)}72%,84%{transform:translateX(-1.2px)}}
+@keyframes av-breathe{50%{transform:translateY(-.7px) scale(1.025,.98)}}
+@keyframes av-sleep{50%{transform:translateY(.8px) scale(1.05,.95)}}
+@keyframes av-nod{50%{transform:translateY(1px) rotate(1.5deg)}}
+@keyframes av-read{0%,100%{transform:translate(-1.6px,.6px)}50%{transform:translate(1.6px,.6px)}}
+@keyframes av-scan{0%,100%{transform:translateX(-2.6px)}50%{transform:translateX(2.6px)}}
+@keyframes av-lean{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+@keyframes av-ping{50%{opacity:.2;transform:scale(1.5)}}
+@keyframes av-type-l{50%{transform:rotate(18deg)}}
+@keyframes av-type-r{50%{transform:rotate(-18deg)}}
+@keyframes av-sway-l{50%{transform:rotate(12deg)}}
+@keyframes av-sway-r{50%{transform:rotate(-12deg)}}
+@keyframes av-heave{0%,100%{transform:translateY(1.5px) scale(1.03,.96)}50%{transform:translateY(-2.5px) scale(.98,1.03)}}
+@keyframes av-lift-l{0%,100%{transform:rotate(10deg)}50%{transform:rotate(60deg)}}
+@keyframes av-lift-r{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(-60deg)}}
+@keyframes av-hover{0%,100%{transform:translateY(1.5px)}50%{transform:translateY(-2px)}}
+@keyframes av-spin{50%{transform:scaleX(.15)}}
+@keyframes av-turn{0%,100%{transform:rotate(-14deg) scale(1)}50%{transform:rotate(14deg) scale(1.06)}}
+@keyframes av-tap{0%,100%{transform:rotate(-62deg)}50%{transform:rotate(-40deg)}}
+@keyframes av-bounce{50%{transform:translateY(-1.8px)}}
+@keyframes av-cheer-l{0%,70%,100%{transform:rotate(122deg)}80%{transform:rotate(150deg)}90%{transform:rotate(110deg)}}
+@keyframes av-cheer-r{0%,70%,100%{transform:rotate(-122deg)}80%{transform:rotate(-150deg)}90%{transform:rotate(-110deg)}}
+@keyframes av-hop{0%,60%,100%{transform:translateY(0)}72%{transform:translateY(-3.2px)}84%{transform:translateY(.8px)}}
+@keyframes av-wave{0%,100%{transform:rotate(-150deg)}50%{transform:rotate(-100deg)}}
+@keyframes av-z{0%{opacity:0;transform:translate(0,3px)}20%{opacity:.9}100%{opacity:0;transform:translate(3px,-6px)}}
+@media (prefers-reduced-motion: reduce){.av *{animation:none!important}}
+</style><rect x="0" y="0" width="905" height="132" rx="14" fill="#1b1b1a"/><rect x="16" y="16" width="873" height="44" rx="10" fill="#262625"/><svg x="28" y="25" width="723" height="26" viewBox="0 0 723 26"><g class="blocked"><circle class="fill" cx="6" cy="13" r="4"/></g>
+<g class="landed"><rect class="track" x="16" y="10" width="51.25" height="6" rx="3"/><rect class="fill" x="16" y="10" width="51" height="6" rx="3"/></g><g class="cleared"><rect class="track" x="69.25" y="10" width="51.25" height="6" rx="3"/><rect class="fill" x="69.25" y="10" width="51" height="6" rx="3"/></g><g class="flying"><rect class="track" x="122.5" y="10" width="51.25" height="6" rx="3"/><rect class="fill" x="122.5" y="10" width="19" height="6" rx="3"/></g><g class="blocked"><rect class="track" x="175.75" y="10" width="51.25" height="6" rx="3"/><rect class="fill" x="175.75" y="10" width="51" height="6" rx="3"/></g><g class="flying"><rect class="track" x="229" y="10" width="51.25" height="6" rx="3"/><rect class="fill" x="229" y="10" width="32" height="6" rx="3"/></g><g class="parked"><rect class="track" x="282.25" y="10" width="51.25" height="6" rx="3"/><rect class="fill" x="282.25" y="10" width="21" height="6" rx="3"/></g><g class="candidate"><rect class="track" x="335.5" y="10" width="51.25" height="6" rx="3"/><rect class="fill" x="335.5" y="10" width="51" height="6" rx="3"/></g><g class="planned"><rect class="track" x="388.75" y="10" width="51.25" height="6" rx="3"/></g><g class="planned"><rect class="track" x="442" y="10" width="51.25" height="6" rx="3"/></g><g class="planned"><rect class="track" x="495.25" y="10" width="51.25" height="6" rx="3"/></g>
+<text class="ink" x="556.5" y="17.5" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif" font-size="12.5">2 running · 1/10</text>
+<text class="soft" x="691" y="17.5" text-anchor="end" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif" font-size="12.5">44%</text>
+<g class="av c-scout is-flying flying" transform="translate(696,0) scale(0.5416666666666666)"><path class='arm l' d='M14.0 28.0q-4.5 .6-4.5 9'/><path class='arm r' d='M34.0 28.0q4.5 .6 4.5 9'/><g class='core'><path class='ant' d='M24 8.6V4'/><circle class='ping' cx='24' cy='3.4' r='1.7'/><path class='body' d='M33.7 21.9Q34.0 23.0 34.2 24.1Q34.4 25.3 34.4 26.4Q34.5 27.5 34.3 28.5Q34.2 29.6 33.9 30.6Q33.6 31.5 33.1 32.4Q32.7 33.3 32.0 34.0Q31.4 34.7 30.6 35.3Q29.8 35.9 28.9 36.4Q28.0 36.8 27.0 37.1Q26.1 37.3 25.0 37.4Q24.0 37.5 23.0 37.4Q21.9 37.3 21.0 37.1Q20.0 36.8 19.1 36.4Q18.2 35.9 17.4 35.3Q16.6 34.7 16.0 34.0Q15.3 33.3 14.9 32.4Q14.4 31.5 14.1 30.6Q13.8 29.6 13.7 28.5Q13.5 27.5 13.6 26.4Q13.6 25.3 13.8 24.1Q14.0 23.0 14.3 21.9Q14.6 20.7 15.0 19.6Q15.4 18.5 15.9 17.5Q16.4 16.4 16.9 15.4Q17.4 14.5 18.0 13.6Q18.5 12.7 19.1 12.0Q19.6 11.3 20.2 10.7Q20.8 10.1 21.3 9.6Q21.9 9.2 22.4 8.9Q22.9 8.7 23.5 8.6Q24.0 8.5 24.5 8.6Q25.1 8.7 25.6 8.9Q26.1 9.2 26.7 9.6Q27.2 10.1 27.8 10.7Q28.4 11.3 28.9 12.0Q29.5 12.7 30.0 13.6Q30.6 14.5 31.1 15.4Q31.6 16.4 32.1 17.5Q32.6 18.5 33.0 19.6Q33.4 20.7 33.7 21.9Z'/><g class='gaze'><rect class='eye' x='19.8' y='19.0' width='2.8' height='6.2' rx='1.4'/><rect class='eye' x='25.4' y='19.0' width='2.8' height='6.2' rx='1.4'/></g><text class='z z1' x='35' y='12'>z</text><text class='z z2' x='39' y='7'>z</text></g></g></svg>
+<text x="805" y="43" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" font-weight="500" fill="#ececeb" text-anchor="start" >Fleet</text><text x="865" y="43" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" font-weight="500" fill="#a3a3a0" text-anchor="start" >✕</text>
+<rect x="16" y="70" width="873" height="46" rx="10" fill="none" stroke="#ffffff1f"/><text x="32" y="98" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" font-weight="400" fill="#a3a3a0" text-anchor="start" >Reply to the tower</text></svg>
