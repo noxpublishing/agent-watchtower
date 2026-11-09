@@ -10,6 +10,7 @@
   color-scheme: light dark;
   --bg: #faf9f6; --strip: transparent; --ink: #1f1f1e; --soft: #6b6b68; --rule: #00000022; --track: #00000012;
   --flying: #1f78d6; --approach: #b56a00; --cleared: #0d8a63; --landed: #0d8a63; --blocked: #c93a3a; --holding: #66728a; --planned: #8e9cb3;
+  --activity-working: #1b64b5; --activity-connected: #076d4a; --activity-stale: #895000;
   
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -17,6 +18,7 @@
   :root {
     --bg: #1a1a19; --strip: transparent; --ink: #ececeb; --soft: #a3a3a0; --rule: #ffffff1f; --track: #ffffff14;
     --flying: #6cb6ff; --approach: #ffb454; --cleared: #7fe7bb; --landed: #3ddc97; --blocked: #ff7b7b; --holding: #8e9cb3; --planned: #7c8aa2;
+    --activity-working: var(--flying); --activity-connected: var(--landed); --activity-stale: var(--approach);
   }
 }
 * { box-sizing: border-box; }
@@ -67,7 +69,7 @@ summary { cursor: pointer; }
 .codex-pane .top h3 { font-size: 14px; }
 .codex-pane .title, .codex-pane .note { font-size: 12.5px; }
 .codex-status { margin: 8px 0 14px; color: var(--soft); font-size: 12px; }
-.codex-status[data-state="connected"] { color: var(--landed); }
+.codex-status[data-state="connected"] { color: var(--activity-connected); }
 .codex-status[data-state="offline"] { color: var(--blocked); }
 .activity-list { list-style: none; margin: 0 0 18px; padding: 0; border-top: 1px solid var(--rule); }
 .activity-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--rule); }
@@ -77,9 +79,9 @@ summary { cursor: pointer; }
 .activity-list strong { display: block; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
 .activity-list small, .activity-state { color: var(--soft); font-size: 12px; overflow-wrap: anywhere; }
 .activity-state { text-align: right; }
-.activity-state.s-working { color: var(--flying); }
+.activity-state.s-working { color: var(--activity-working); }
 .activity-state.s-interrupted { color: var(--blocked); }
-.activity-state.s-stale { color: var(--approach); }
+.activity-state.s-stale { color: var(--activity-stale); }
 summary:focus-visible { outline: 2px solid var(--flying); outline-offset: 3px; }
 @media (max-width: 360px) { .codex-pane .base { margin-left: 0; } }
 .s-flying { color: var(--flying); } .s-candidate, .s-review { color: var(--approach); } .s-cleared { color: var(--cleared); }
