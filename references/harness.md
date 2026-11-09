@@ -25,7 +25,11 @@ The client's own limit stays in force: `agents.max_concurrent_threads_per_sessio
 
 **Classes:** `tower-install.sh codex` installs `~/.codex/agents/tower-*.toml`. They keep the user's model and set effort only. Spawn by name when the tool lists them.
 
-**Board:** Codex has no side panel. Run `tower-deck.sh` for a live deck in its own pane or window, or `tower-board.sh --html --watch` in the background and give the human the printed `file://` address for a browser or the in-app browser. Mirror the block in the plan tool when exposed, and include `tower-board.sh --plain` in a progress message at real milestones. Stop the watcher at the end of the shift.
+**Board:** Start `python3 "$WATCHTOWER_SKILL_DIR/scripts/tower-codex.py" board` from the target repository. Open its printed loopback URL in the desktop app's built-in browser when that capability is available. The board works in an ordinary browser too. Start it before the work you want to observe and stop it at the end of the shift. Mirror the block in the plan tool when exposed, and include `tower-board.sh --plain` in a progress message at real milestones.
+
+**Live activity setup:** The user opts in with `tower-install.sh codex-live` and reviews the new entries in **Settings → Hooks** (`/hooks` in the CLI). Do not auto-trust or change hook permissions. The hooks record lifecycle metadata only in repositories where the local board has been started. A worker's normal `tower-area.sh step` associates its reported Codex thread with its assigned worktree. Session state and flight-plan state are separate: an idle subagent has finished a turn, and the worktree still needs its usual delivery and review.
+
+Watchtower's progress commands need write access to its shared state. If the workspace sandbox protects the common Git directory, use an absolute `TOWER_HOME` in a user-approved writable directory and pass it to the Codex runtime and board process so the hooks and workers see the same state.
 
 Subagents share the filesystem. Create each worktree explicitly before dispatching:
 

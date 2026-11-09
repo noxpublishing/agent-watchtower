@@ -44,6 +44,14 @@ git clone https://github.com/noxpublishing/agent-watchtower ~/agent-watchtower
 
 Use `all` instead of `codex` to also link it into `~/.claude/skills`. Pick one way per client, so Claude Code does not load it twice. Then start a new session.
 
+### Live activity in Codex desktop
+
+With Python 3.8 or newer, run `scripts/tower-install.sh codex-live` from the Watchtower checkout. Review the Watchtower entries in **Settings → Hooks** (`/hooks` in the CLI), then start a new local Codex chat in your project.
+
+Run `python3 ~/.codex/skills/watchtower/scripts/tower-codex.py board` from the project and open the printed address in Codex's built-in browser. The pane shows the flight plan and actual Codex sessions and subagents as they work, go idle, or report an interruption. Workers associate themselves with their assigned worktrees through their normal progress reports. Start the board before the turn you want to follow. Stop the foreground server with Ctrl+C.
+
+The board listens on loopback and enables capture for that repository. Watchtower keeps the last activity state in the shared Git directory and expires records after 24 hours. The hooks store identifiers and lifecycle metadata only. To disable capture, disable the Watchtower entries in **Settings → Hooks**.
+
 ## Start
 
 Open any repository or empty folder and say:
@@ -245,7 +253,7 @@ scripts/tower-deck.sh
 |---|---|---|
 | Claude Code desktop app | Starts, messages and hands over sessions directly | Bar and side panel |
 | Claude Code in a terminal | Subagents, or one session per tmux pane | Bar and panel in fullscreen rendering, or the deck |
-| Codex | Explicit worktree dispatch, worker classes, handoff when usage and detach tools are absent | Deck or browser page |
+| Codex | Explicit worktree dispatch, worker classes, handoff when usage and detach tools are absent | Live activity in the built-in browser, or terminal deck |
 | Cursor and others | That tool's own way of running sessions. Not tested. | Deck or browser page |
 
 See [the harness notes](references/harness.md).
