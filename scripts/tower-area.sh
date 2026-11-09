@@ -321,6 +321,9 @@ cmd_step() {
   set -- "step_done=$done_" "note=$note"
   if is_count "$total"; then set -- "$@" "step_total=$total"; fi
   put "$id" "$@" >/dev/null 2>&1 || true
+  if [ -n "${CODEX_THREAD_ID:-}" ] && [ -f "$home/codex.sqlite3" ] && command -v python3 >/dev/null 2>&1; then
+    python3 "$here/tower-codex.py" bind || true
+  fi
 }
 
 cmd_deliver() {

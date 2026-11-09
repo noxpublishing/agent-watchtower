@@ -2,6 +2,7 @@
 # Install this checkout for your agents. Links instead of copying, so `git pull` updates it.
 #   tower-install.sh claude    skill, flight board and worker classes for Claude Code
 #   tower-install.sh codex     skill and worker classes for Codex
+#   tower-install.sh codex-live  opt in to live Codex activity hooks
 #   tower-install.sh all
 # Existing files of another origin are left alone and named.
 set -u
@@ -66,12 +67,13 @@ install_codex() {
   link_skill "$home/skills/watchtower" || exit 1
   link_skill_part "$home/skills/watchtower-setup"
   codex_agents "$home/agents"
-  echo "Codex has no side panel. Keep the board beside it: scripts/tower-deck.sh, or scripts/tower-board.sh --html --watch for the browser."
+  echo "For live activity in the Codex browser pane, run scripts/tower-install.sh codex-live."
 }
 
 case "${1:-}" in
   claude) install_claude ;;
   codex) install_codex ;;
+  codex-live) exec python3 "$root/scripts/tower-codex.py" install ;;
   all) install_claude; install_codex ;;
-  *) sed -n '2,6p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2 ;;
+  *) sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2 ;;
 esac

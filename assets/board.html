@@ -59,6 +59,29 @@ summary { cursor: pointer; }
 .empty, .stale { color: var(--soft); margin-top: 28px; }
 .stale { margin-top: 10px; font-size: 12.5px; color: var(--approach); }
 .loose { font-size: 12.5px; line-height: 1.8; color: var(--soft); overflow-wrap: anywhere; }
+.codex-pane { max-width: 680px; padding: 20px 16px 40px; }
+.codex-pane h1 { font-size: 21px; font-weight: 650; }
+.codex-pane h2, .codex-pane summary { font-size: 14px; font-weight: 650; margin: 22px 0 8px; }
+.codex-pane .head { padding: 10px 12px; }
+.codex-pane .crew { padding: 6px 12px; }
+.codex-pane .top h3 { font-size: 14px; }
+.codex-pane .title, .codex-pane .note { font-size: 12.5px; }
+.codex-status { margin: 8px 0 14px; color: var(--soft); font-size: 12px; }
+.codex-status[data-state="connected"] { color: var(--landed); }
+.codex-status[data-state="offline"] { color: var(--blocked); }
+.activity-list { list-style: none; margin: 0 0 18px; padding: 0; border-top: 1px solid var(--rule); }
+.activity-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--rule); }
+.activity-actor { display: flex; align-items: center; min-width: 0; gap: 8px; }
+.activity-actor svg { display: block; flex: none; width: 30px; height: 30px; }
+.activity-actor div { min-width: 0; }
+.activity-list strong { display: block; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.activity-list small, .activity-state { color: var(--soft); font-size: 12px; overflow-wrap: anywhere; }
+.activity-state { text-align: right; }
+.activity-state.s-working { color: var(--flying); }
+.activity-state.s-interrupted { color: var(--blocked); }
+.activity-state.s-stale { color: var(--approach); }
+summary:focus-visible { outline: 2px solid var(--flying); outline-offset: 3px; }
+@media (max-width: 360px) { .codex-pane .base { margin-left: 0; } }
 .s-flying { color: var(--flying); } .s-candidate, .s-review { color: var(--approach); } .s-cleared { color: var(--cleared); }
 .s-landed { color: var(--landed); } .s-blocked { color: var(--blocked); } .s-parked { color: var(--holding); } .s-planned { color: var(--planned); }
 @media (prefers-reduced-motion: reduce) { .slot i, .route u { transition: none; } }
@@ -70,6 +93,9 @@ summary { cursor: pointer; }
 <script>
 const ORDER = ['blocked', 'candidate', 'review', 'cleared', 'flying', 'parked']
 const LABEL = { flying: 'Running', candidate: 'Delivered', review: 'In review', cleared: 'Ready to land', landed: 'Landed', blocked: 'Needs you', parked: 'Paused', planned: 'Planned' }
+const ACTIVITY = { working: 'Working', idle: 'Idle', interrupted: 'Interrupted', closed: 'Closed', stale: 'No recent signal' }
+const board = document.getElementById('board')
+const inCodex = board.hasAttribute('data-codex')
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 const age = s => s >= 3600 ? `${Math.floor(s / 3600)}h${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}` : s >= 60 ? `${Math.floor(s / 60)}m` : `${s}s`
 const tok = n => n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}k` : String(n)
@@ -99,7 +125,7 @@ function block(a) {
       ${middle}
       <div class="meta">${meta}</div>
     </div>
-    <div class="crew">${face(a)}<div><b>tower-${esc(a.class)}</b><span>${esc(usage || 'no usage reported yet')}</span></div></div>
+    <div class="crew">${face(a)}<div><b>tower-${esc(a.class)}</b>${inCodex ? '' : `<span>${esc(usage || 'no usage reported yet')}</span>`}</div></div>
   </article>`
 }
 
@@ -117,6 +143,22 @@ function ciMark(ci) {
 
 let openLanded = false
 
+function activity(actors) {
+  const active = actors.filter(a => a.state === 'working').length
+  const rows = actors.slice(0, Math.max(active, 8)).map(a => {
+    const meta = [a.worktree, a.model, a.actor.slice(-8)].filter(Boolean).map(esc).join(' · ')
+    const name = a.kind === 'session' ? 'Codex session' : a.role && a.role !== 'default' ? a.role : 'Subagent'
+    const role = a.role.replace(/^tower-/, '')
+    const avatarClass = a.kind === 'session' ? 'ace' : Object.hasOwn(window.__avatars || {}, role) ? role : 'liner'
+    const avatarState = a.state === 'working' ? 'flying' : a.state === 'interrupted' ? 'blocked' : 'parked'
+    return `<li><div class="activity-actor">${face({ class: avatarClass, state: avatarState })}<div><strong>${esc(name)}</strong><small>${meta}</small></div></div>
+      <span class="activity-state s-${esc(a.state)}">${esc(ACTIVITY[a.state] || a.state)}</span></li>`
+  }).join('')
+  return `<h2>Codex activity${active ? ` · ${active} working` : ''}</h2>${
+    rows ? `<ul class="activity-list">${rows}</ul>` : '<p class="tally">Waiting for Codex events. Start a turn in this repository with the Watchtower hooks enabled.</p>'
+  }`
+}
+
 function render(f) {
   const areas = f.areas.filter(a => a.state !== 'dropped')
   const landed = areas.filter(a => a.state === 'landed')
@@ -127,8 +169,10 @@ function render(f) {
   const tokens = areas.reduce((sum, a) => sum + a.tokens, 0)
   const seconds = Math.max(0, ...areas.map(a => a.age))
   const fleet = areas.map(a => `<div class="slot s-${esc(a.state)}" title="${esc(a.id)}: ${esc(LABEL[a.state] || a.state)}"><i style="width:${a.state === 'blocked' ? 100 : Math.round(share(a) * 100)}%"></i></div>`).join('')
-  let html = `<header><h1>${esc(f.mission || 'Watchtower')}</h1><span class="base">${esc(f.base)} @ ${esc(f.sha)}${ciMark(f.ci)}</span></header>
-    <div class="totals"><div><small>Cost</small><b>≈$${cost.toFixed(2)}</b></div><div><small>Tokens</small><b>${tok(tokens)}</b></div><div><small>Time</small><b>${age(seconds)}</b></div></div>
+  let html = `<header><h1>${esc(f.mission || 'Watchtower')}</h1><span class="base">${esc(f.base)} @ ${esc(f.sha)}${ciMark(f.ci)}</span></header>`
+  if (inCodex) html += `<p class="codex-status" id="connection" role="status" data-state="connected">Live · Local Codex</p>${activity(f.codex || [])}`
+  else html += `<div class="totals"><div><small>Cost</small><b>≈$${cost.toFixed(2)}</b></div><div><small>Tokens</small><b>${tok(tokens)}</b></div><div><small>Time</small><b>${age(seconds)}</b></div></div>`
+  html += `
     <div class="fleet" role="img" aria-label="${landed.length} of ${areas.length} areas landed">${fleet}</div>
     <div class="tally">${landed.length}/${areas.length} landed · ${running} running · limit ${f.limit ?? 'none'} · checks ${f.runways.busy}/${f.runways.limit}${f.runways.waiting ? ` +${f.runways.waiting}` : ''}</div>
     <p class="stale" id="stale" hidden>This page stopped updating. Is tower-board.sh --html --watch still running?</p>`
@@ -137,29 +181,64 @@ function render(f) {
   if (planned.length) html += `<h2>Planned · ${planned.length}</h2>${planned.map(quiet).join('')}`
   if (landed.length) html += `<details ${openLanded ? 'open' : ''} id="landed"><summary>Landed · ${landed.length}</summary>${landed.map(quiet).join('')}</details>`
   if (f.loose.length) html += `<h2>Other worktrees · ${f.loose.length}</h2><div class="loose">${f.loose.map(w => `${esc(w.worktree)} · ${esc(w.branch)} ↑${w.ahead} ↓${w.behind} ✎${w.dirty}`).join('<br>')}</div>`
-  document.getElementById('board').innerHTML = html
+  const restoreFocus = document.activeElement?.matches('#landed > summary')
+  board.innerHTML = html
   const details = document.getElementById('landed')
-  if (details) details.addEventListener('toggle', () => { openLanded = details.open })
+  if (details) {
+    details.addEventListener('toggle', () => { openLanded = details.open })
+    if (restoreFocus) details.firstElementChild.focus({ preventScroll: true })
+  }
   document.title = `${landed.length}/${areas.length} landed · Watchtower`
 }
 
 let last = ''
-function poll() {
+function update(fleet) {
+  const next = JSON.stringify(fleet, (key, value) => inCodex && (key === 'now' || key === 'age') ? undefined : value)
+  if (next !== last) { last = next; render(fleet) }
+}
+
+function pollFile() {
   // A script tag is the one way to refresh from a file:// page without a server.
   const tag = document.createElement('script')
   tag.src = `data.js?t=${Date.now()}`
   tag.onload = () => {
     tag.remove()
-    const next = JSON.stringify(window.__fleet)
-    if (next !== last) { last = next; render(window.__fleet) }
+    update(window.__fleet)
     const stale = document.getElementById('stale')
     if (stale) stale.hidden = Date.now() / 1000 - window.__fleet.now < 20
   }
   tag.onerror = () => tag.remove()
   document.head.append(tag)
 }
-poll()
-setInterval(poll, 2000)
+
+async function pollCodex() {
+  let connected = false
+  try {
+    const response = await fetch('fleet.json', { signal: AbortSignal.timeout(12000) })
+    if (response.ok) {
+      update(await response.json())
+      connected = true
+    }
+  } catch {
+    // Keep the last fleet visible while the local server is unavailable.
+  }
+  const status = document.getElementById('connection')
+  const next = connected ? 'connected' : 'offline'
+  if (status && status.dataset.state !== next) {
+    status.dataset.state = next
+    status.textContent = connected ? 'Live · Local Codex' : 'Disconnected · Showing the last available state'
+  }
+  setTimeout(pollCodex, 2000)
+}
+
+if (inCodex) {
+  board.classList.add('codex-pane')
+  board.innerHTML = '<h1>Watchtower</h1><p class="codex-status" id="connection" role="status">Connecting to the local board…</p>'
+  pollCodex()
+} else {
+  pollFile()
+  setInterval(pollFile, 2000)
+}
 </script>
 </body>
 </html>
